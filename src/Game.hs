@@ -4,34 +4,9 @@
 module Game where
 
 import Structure.Object
+import Type
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
-
--- | Type for coordinates on the field
-type Coords = (Float, Float)
-
--- | Type for rectangle, which used for
--- hit box of the elements
-type Rectangle = (Coords, Coords)
-
--- | Data type for Zombie
-data Zombie = Zombie
-  { zCoords   :: Coords    -- ^ coordinates of zombie
-  , zSpeed    ::  Float    -- ^ movement speed
-  , zStrength ::    Int    -- ^ strength of the zombie
-  }
-
--- | Data type for Plants
-data Plant = Plant
-  { pCoords :: Coords      -- ^ coordinated of plants
-  , pHealth ::    Int      -- ^ health of the plant
-  }
-
--- | Data type for whole Universe
-data Universe = Universe
-  { uEnemies :: [Zombie]   -- ^ list of enemies
-  , uDefense ::  [Plant]   -- ^ list of plants
-  }
 
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
@@ -44,9 +19,9 @@ sampleZombies =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant (-150,  100) 10
-  , Plant (-150,    0) 10
-  , Plant (-150, -100) 10
+  [ Plant (-150,  100) 10 (Projectile (-210))
+  , Plant (-150,    0) 10 (Projectile (-210))
+  , Plant (-150, -100) 10 (Projectile (-210))
   ]
 
 -- | Starter universe
@@ -54,6 +29,7 @@ initUniverse :: Universe
 initUniverse = Universe 
                sampleZombies
                samplePlants
+               0
 
 -- | High-level function to draw an object
 -- of the game on the screen
@@ -70,9 +46,11 @@ drawZombie z = Translate x y zombie
 -- | Function to render plant on the
 -- screen
 drawPlant :: Plant -> Picture
-drawPlant p = Translate x y plant
+drawPlant p = Translate  x y  plant
+           <> Translate px y projectile
   where
-    (x, y) = pCoords p
+    (x,   y) = pCoords p
+    px = prX (pBullet p)
 
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
@@ -94,10 +72,12 @@ updateUniverse :: Float -> Universe -> Universe
 updateUniverse dt u = u
   { uEnemies = newEnemies
   , uDefense = newDefense
+  , uTime    = newTime
   }
   where
     newEnemies = updateZombies dt (uDefense u) (uEnemies u)
-    newDefense = updatePlants  dt (uEnemies u) (uDefense u)
+    newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
+    newTime = (uTime u) + dt
 
 -- | Function to update zombies
 updateZombies :: Float -> [Plant] -> [Zombie] -> [Zombie]
@@ -122,18 +102,37 @@ moveZombie dt z = z
     v      = zSpeed  z
 
 -- | Function to update plant
-updatePlants :: Float -> [Zombie] -> [Plant] -> [Plant]
-updatePlants dt zs ps
-  | (round dt) `mod` (6 :: Integer) == 0 = deletePlant loweredPlants
-  | otherwise                              = ps
+updatePlants :: Float -> Float -> [Zombie] -> [Plant] -> [Plant]
+updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
+                             deletePlant . 
+                             attackPlants newTime zs                     
   where
     deletePlant plants = filter (hasHealth) plants
     hasHealth p = (pHealth p) > 0
-    loweredPlants = attackPlants zs ps
+
+plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
+plantShoots dt newTime zs p
+  | (round newTime) `mod` (13 :: Integer) == 0 = shoot
+  | otherwise = moveProjectile
+  where
+   shoot = p { pBullet = newBullet }
+   newBullet = bullet { prX = -135 }
+   movedBullet = bullet { prX = px + dt*20 }
+   bullet = pBullet p
+   px = prX bullet
+   (_x, y) = pCoords p
+   moveProjectile
+     | True `elem` collisions = p { pBullet = Projectile (-210) }
+     | otherwise = p { pBullet = movedBullet }
+     where
+       zombiesCoords = map (zCoords) zs
+       collisions = map (checkCollision (prX movedBullet, y)) zombiesCoords
 
 -- | Function to lower health of plants
-attackPlants :: [Zombie] -> [Plant] -> [Plant]
-attackPlants zs ps = map (reduceHealth zs) ps
+attackPlants :: Float -> [Zombie] -> [Plant] -> [Plant]
+attackPlants dt zs ps 
+  | (floor dt) `mod` (6 :: Integer) == 0 = map (reduceHealth zs) ps
+  | otherwise = ps
 
 -- | Function to reduce health of plant
 reduceHealth :: [Zombie] -> Plant -> Plant

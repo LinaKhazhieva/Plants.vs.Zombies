@@ -11,6 +11,9 @@ zombie = color (dark aquamarine) (circleSolid 10)
 plant :: Picture
 plant = color green (rectangleSolid 20 20)
 
+projectile :: Picture
+projectile = circleSolid 5
+
 field :: Picture
 field = line [(-200,  -50), (200,  -50)]
      <> line [(-200, -150), (200, -150)]

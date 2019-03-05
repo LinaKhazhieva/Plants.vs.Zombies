@@ -16,13 +16,15 @@ type Rectangle = (Coords, Coords)
 
 -- | Data type for Zombie
 data Zombie = Zombie
-  { zCoords ::    Coords      -- ^ coordinates of zombie
-  , zSpeed  ::     Float      -- ^ movement speed
+  { zCoords   :: Coords    -- ^ coordinates of zombie
+  , zSpeed    ::  Float    -- ^ movement speed
+  , zStrength ::    Int    -- ^ strength of the zombie
   }
 
 -- | Data type for Plants
 data Plant = Plant
   { pCoords :: Coords      -- ^ coordinated of plants
+  , pHealth ::    Int      -- ^ health of the plant
   }
 
 -- | Data type for whole Universe
@@ -34,17 +36,17 @@ data Universe = Universe
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie (150,  100) 4
-  , Zombie (150,    0) 5
-  , Zombie (150, -100) 7
+  [ Zombie (150,  100) 4 1
+  , Zombie (150,    0) 5 1
+  , Zombie (150, -100) 7 1
   ]
 
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant (-150,  100)
-  , Plant (-150,    0)
-  , Plant (-150, -100)
+  [ Plant (-150,  100) 10
+  , Plant (-150,    0) 10
+  , Plant (-150, -100) 10
   ]
 
 -- | Starter universe
@@ -91,9 +93,11 @@ handleUniverse _e u = u
 updateUniverse :: Float -> Universe -> Universe
 updateUniverse dt u = u
   { uEnemies = newEnemies
+  , uDefense = newDefense
   }
   where
     newEnemies = updateZombies dt (uDefense u) (uEnemies u)
+    newDefense = updatePlants  dt (uEnemies u) (uDefense u)
 
 -- | Function to update zombies
 updateZombies :: Float -> [Plant] -> [Zombie] -> [Zombie]
@@ -116,6 +120,34 @@ moveZombie dt z = z
   where
     (x, y) = zCoords z
     v      = zSpeed  z
+
+-- | Function to update plant
+updatePlants :: Float -> [Zombie] -> [Plant] -> [Plant]
+updatePlants dt zs ps
+  | (round dt) `mod` (6 :: Integer) == 0 = deletePlant loweredPlants
+  | otherwise                              = ps
+  where
+    deletePlant plants = filter (hasHealth) plants
+    hasHealth p = (pHealth p) > 0
+    loweredPlants = attackPlants zs ps
+
+-- | Function to lower health of plants
+attackPlants :: [Zombie] -> [Plant] -> [Plant]
+attackPlants zs ps = map (reduceHealth zs) ps
+
+-- | Function to reduce health of plant
+reduceHealth :: [Zombie] -> Plant -> Plant
+reduceHealth [] p = p
+reduceHealth (z:zs) p = reduce
+  where
+    reduce
+      | checkCollision zXY pXY = reduceHealth zs newPlant
+      | otherwise = reduceHealth zs p
+      where
+        zXY = zCoords z
+        pXY = pCoords p
+        newPlant = p
+           { pHealth = (pHealth p) - (zStrength z) }
 
 -- | Function to check collisions of hitboxes
 checkCollision :: Coords -> Coords -> Bool

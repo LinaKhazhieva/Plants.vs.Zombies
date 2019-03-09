@@ -5,17 +5,23 @@ module Type where
 -- | Type for coordinates on the field
 type Coords = (Float, Float)
 
+-- | Data type to store different types of zombie
+data ZombieType = ZombieOne | ZombieTwo | ZombieThree
+
+-- | Data type to store different types of plant
+data PlantType = PlantOne | PlantTwo
+
 -- | Data type for Zombie
 data Zombie = Zombie
-  { zCoords   :: Coords    -- ^ coordinates of zombie
-  , zSpeed    ::  Float    -- ^ movement speed
-  , zStrength ::    Int    -- ^ strength of the zombie
+  { zType     :: ZombieType
+  , zCoords   :: Coords    -- ^ coordinates of zombie
   }
 
 -- | Data type for Plants
 data Plant = Plant
-  { pCoords   ::     Coords -- ^ coordinates of plants
-  , pHealth   ::        Int -- ^ health of the plant
+  { pType     ::  PlantType
+  , pCoords   ::     Coords -- ^ coordinates of plants
+  , pDamage   ::        Int -- ^ health of the plant
 --  , pStrength ::        Int -- ^ strength of the plant
   , pBullet   :: Projectile -- ^ projectile of the plant
   }

@@ -5,23 +5,24 @@ module Game where
 
 import Structure.Object
 import Type
+import Accessor
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie (150,  100) 4 1
-  , Zombie (150,    0) 5 1
-  , Zombie (150, -100) 7 1
+  [ Zombie ZombieOne (150,  100)
+  , Zombie ZombieTwo (150,    0)
+  , Zombie ZombieThree (150, -100)
   ]
 
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant (-150,  100) 10 (Projectile (-210))
-  , Plant (-150,    0) 10 (Projectile (-210))
-  , Plant (-150, -100) 10 (Projectile (-210))
+  [ Plant PlantOne (-150,  100) 0 (Projectile (-400))
+  , Plant PlantOne (-150,    0) 0 (Projectile (-400))
+  , Plant PlantOne (-150, -100) 0 (Projectile (-400))
   ]
 
 -- | Starter universe
@@ -39,18 +40,20 @@ drawObject draw xs = pictures (map draw xs)
 -- | Function to render zombie on the
 -- screen
 drawZombie :: Zombie -> Picture
-drawZombie z = Translate x y zombie
+drawZombie z = Translate x y pic 
   where
     (x, y) = zCoords z
+    pic = zPicture (zType z)
 
 -- | Function to render plant on the
 -- screen
 drawPlant :: Plant -> Picture
-drawPlant p = Translate  x y  plant
+drawPlant p = Translate  x y pic
            <> Translate px y projectile
   where
     (x,   y) = pCoords p
     px = prX (pBullet p)
+    pic = pPicture (pType p)
 
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
@@ -99,7 +102,7 @@ moveZombie dt z = z
   }
   where
     (x, y) = zCoords z
-    v      = zSpeed  z
+    v      = zSpeed  (zType z)
 
 -- | Function to update plant
 updatePlants :: Float -> Float -> [Zombie] -> [Plant] -> [Plant]
@@ -108,7 +111,7 @@ updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
                              attackPlants newTime zs                     
   where
     deletePlant plants = filter (hasHealth) plants
-    hasHealth p = (pHealth p) > 0
+    hasHealth p = (pDamage p) <= (pHealth (pType p))
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
@@ -122,7 +125,7 @@ plantShoots dt newTime zs p
    px = prX bullet
    (_x, y) = pCoords p
    moveProjectile
-     | True `elem` collisions = p { pBullet = Projectile (-210) }
+     | True `elem` collisions = p { pBullet = Projectile (-400) }
      | otherwise = p { pBullet = movedBullet }
      where
        zombiesCoords = map (zCoords) zs
@@ -146,7 +149,7 @@ reduceHealth (z:zs) p = reduce
         zXY = zCoords z
         pXY = pCoords p
         newPlant = p
-           { pHealth = (pHealth p) - (zStrength z) }
+           { pDamage = (pDamage p) + (zStrength (zType z)) }
 
 -- | Function to check collisions of hitboxes
 checkCollision :: Coords -> Coords -> Bool

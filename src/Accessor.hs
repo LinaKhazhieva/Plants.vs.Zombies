@@ -36,3 +36,12 @@ pStrength _p = 1
 -- | Accessor to render plant type
 pPicture :: PlantType -> Picture
 pPicture _p = plant
+
+-- | Accessor for the sunflower
+sHealth :: Sunflower -> Int 
+sHealth _s = 10 
+
+-- | Accessor to render sunflower 
+--sPicture :: Sunflower -> Picture 
+--sPicture _s = sunFlower
+

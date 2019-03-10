@@ -24,12 +24,19 @@ samplePlants =
   , Plant PlantOne (-150,    0) 0 (Projectile (-400))
   , Plant PlantOne (-150, -100) 0 (Projectile (-400))
   ]
+ 
+-- | Predefined sunflowers structure
+sampleSunflowers :: [Sunflower]
+sampleSunflowers = 
+    [ Sunflower (-100, 100) 0 [Sun (-75, 75)]
+    ]
 
 -- | Starter universe
 initUniverse :: Universe
 initUniverse = Universe 
                sampleZombies
                samplePlants
+               sampleSunflowers
                0
 
 -- | High-level function to draw an object
@@ -55,14 +62,25 @@ drawPlant p = Translate  x y pic
     px = prX (pBullet p)
     pic = pPicture (pType p)
 
+
+drawSunflower :: Sunflower -> Picture 
+drawSunflower sf = Translate  x y pic
+  where 
+    (x,   y) = sCoords sf
+    pic = color yellow (rectangleSolid 20 20)
+
+
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = drawObject drawZombie zs
+              <> drawObject drawSunflower sf
               <> drawObject drawPlant  ps
+
               <> field
   where
     zs = uEnemies u
     ps = uDefense u
+    sf = uSunflowers u
 
 -- | Function to change universe according
 -- to its rules by the interaction with the player
@@ -75,13 +93,13 @@ updateUniverse :: Float -> Universe -> Universe
 updateUniverse dt u = u
   { uEnemies = newEnemies
   , uDefense = newDefense
+ -- , uSunflower =  newSunflower
   , uTime    = newTime
   }
   where
     newEnemies = updateZombies dt (uDefense u) (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
-  
-
+--    newSunflower = 
     newTime = (uTime u) + dt
 
 -- | Function to update zombies
@@ -177,7 +195,7 @@ reduceHealthZombie dt (p:ps) z = reduce
       where 
         zXY = zCoords z
         prXY = (prX (moveBullet dt (prX  (pBullet p))), y )
-        (_x, y) = pCoords s 
+        (_x, y) = pCoords p 
         newZombie = z 
             {zDamage = (zDamage z) + (pHealth (pType p)) }
 

@@ -13,9 +13,13 @@ zSpeed ZombieOne = 4
 zSpeed ZombieTwo = 5
 zSpeed ZombieThree = 7
 
+-- | Accessor of the zombies health 
+zHealth :: ZombieType -> Int
+zHealth _z = 1
+
 -- | Accessor of the zombies strength
 zStrength :: ZombieType -> Int
-zStrength _z = 1
+zStrength _z = 2
 
 -- | Accessor to render zombie type
 zPicture :: ZombieType -> Picture
@@ -24,6 +28,10 @@ zPicture _z = zombie
 -- | Accessor for the plant
 pHealth :: PlantType -> Int
 pHealth _p = 10
+
+-- | Accessor for the plant strength
+pStrength :: PlantType -> Int 
+pStrength _p = 1
 
 -- | Accessor to render plant type
 pPicture :: PlantType -> Picture

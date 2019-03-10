@@ -12,9 +12,9 @@ import Graphics.Gloss.Interface.Pure.Game
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie ZombieOne (150,  100)
-  , Zombie ZombieTwo (150,    0)
-  , Zombie ZombieThree (150, -100)
+  [ Zombie ZombieOne (150,  100) 0 
+  , Zombie ZombieTwo (150,    0) 0 
+  , Zombie ZombieThree (150, -100) 0
   ]
 
 -- | Predefined defense structure
@@ -80,11 +80,20 @@ updateUniverse dt u = u
   where
     newEnemies = updateZombies dt (uDefense u) (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
+  
+
     newTime = (uTime u) + dt
 
 -- | Function to update zombies
-updateZombies :: Float -> [Plant] -> [Zombie] -> [Zombie]
-updateZombies dt ps zs = map (updateZombie dt ps) zs
+updateZombies :: Float  ->  [Plant] -> [Zombie] -> [Zombie]
+updateZombies dt ps  = map (updateZombie dt ps) . 
+                        deleteZombie .
+                        attackZombies ps  
+  where
+    attackZombies ps zs = map (reduceHealthZombie dt ps) zs  
+    deleteZombie zombies = filter (hasHealth) zombies
+    hasHealth z = (zDamage z) <= (zHealth (zType z))                
+                        
 
 -- | Function to update one zombie
 updateZombie :: Float -> [Plant] -> Zombie -> Zombie
@@ -113,6 +122,8 @@ updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
     deletePlant plants = filter (hasHealth) plants
     hasHealth p = (pDamage p) <= (pHealth (pType p))
 
+
+
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
   | (round newTime) `mod` (13 :: Integer) == 0 = shoot
@@ -120,7 +131,7 @@ plantShoots dt newTime zs p
   where
    shoot = p { pBullet = newBullet }
    newBullet = bullet { prX = -135 }
-   movedBullet = bullet { prX = px + dt*20 }
+   movedBullet = bullet { prX = px + dt*30 }
    bullet = pBullet p
    px = prX bullet
    (_x, y) = pCoords p
@@ -130,26 +141,45 @@ plantShoots dt newTime zs p
      where
        zombiesCoords = map (zCoords) zs
        collisions = map (checkCollision (prX movedBullet, y)) zombiesCoords
+ 
+moveBullet :: Float -> Float -> Projectile
+moveBullet dt px  = Projectile (  px + dt*30 ) 
 
+       
 -- | Function to lower health of plants
 attackPlants :: Float -> [Zombie] -> [Plant] -> [Plant]
 attackPlants dt zs ps 
-  | (floor dt) `mod` (6 :: Integer) == 0 = map (reduceHealth zs) ps
+  | (floor dt) `mod` (6 :: Integer) == 0 = map (reduceHealthPlant zs) ps
   | otherwise = ps
 
 -- | Function to reduce health of plant
-reduceHealth :: [Zombie] -> Plant -> Plant
-reduceHealth [] p = p
-reduceHealth (z:zs) p = reduce
+reduceHealthPlant :: [Zombie] -> Plant -> Plant
+reduceHealthPlant [] p = p
+reduceHealthPlant (z:zs) p = reduce
   where
     reduce
-      | checkCollision zXY pXY = reduceHealth zs newPlant
-      | otherwise = reduceHealth zs p
+      | checkCollision zXY pXY = reduceHealthPlant zs newPlant
+      | otherwise = reduceHealthPlant zs p
       where
         zXY = zCoords z
         pXY = pCoords p
         newPlant = p
            { pDamage = (pDamage p) + (zStrength (zType z)) }
+
+-- | Function to reduce health of zombie 
+reduceHealthZombie :: Float ->  [Plant] -> Zombie -> Zombie
+reduceHealthZombie dt [] z = z 
+reduceHealthZombie dt (p:ps) z = reduce
+  where 
+    reduce 
+      | checkCollision zXY prXY = reduceHealthZombie dt ps newZombie 
+      | otherwise = reduceHealthZombie dt ps z
+      where 
+        zXY = zCoords z
+        prXY = (prX (moveBullet dt (prX  (pBullet p))), y )
+        (_x, y) = pCoords s 
+        newZombie = z 
+            {zDamage = (zDamage z) + (pHealth (pType p)) }
 
 -- | Function to check collisions of hitboxes
 checkCollision :: Coords -> Coords -> Bool

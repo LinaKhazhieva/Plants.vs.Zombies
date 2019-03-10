@@ -15,6 +15,7 @@ data PlantType = PlantOne | PlantTwo
 data Zombie = Zombie
   { zType     :: ZombieType
   , zCoords   :: Coords    -- ^ coordinates of zombie
+  , zDamage   :: Int -- ^ heatlth of the zombie 
   }
 
 -- | Data type for Plants

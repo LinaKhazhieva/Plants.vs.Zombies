@@ -11,7 +11,8 @@ import Render
 import Settings
 import GameOver
 import Update
-    
+
+
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = field

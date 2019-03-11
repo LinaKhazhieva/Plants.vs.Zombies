@@ -4,21 +4,26 @@
 module Structure.Object where
 
 import Graphics.Gloss
+import Graphics.Gloss.Data.Bitmap
+import System.IO.Unsafe (unsafePerformIO)
 
 zombie :: Picture
-zombie = color (dark aquamarine) (circleSolid 10)
+zombie = scale 0.1 0.1 (unsafePerformIO $ loadBMP "../images/Buckethead_Zombie.bmp" )
 
 plant :: Picture
-plant = color green (rectangleSolid 20 20)
+plant = scale 0.025 0.025 (unsafePerformIO $ loadBMP "../images/Peashooter.bmp" )
 
 projectile :: Picture
-projectile = circleSolid 5
+projectile = scale 0.5 0.5 (unsafePerformIO $ loadBMP "../images/ProjectilePea.bmp" )
+
+sun :: Picture 
+sun = scale 0.1 0.1 (unsafePerformIO $ loadBMP "../images/sun.bmp" )
+
+sunflower :: Picture 
+sunflower = scale 0.03 0.03 (unsafePerformIO $ loadBMP "../images/sunflower.bmp")
 
 field :: Picture
-field = line [(-200,  -50), (200,  -50)]
-     <> line [(-200, -150), (200, -150)]
-     <> line [(-200,   50), (200,   50)]
-     <> line [(-200,  150), (200,  150)]
+field = scale 0.5 0.5  (unsafePerformIO $ loadBMP "../images/Background.bmp" )
 
 lost :: Picture
 lost = Translate (-200) 0 (scale 0.5 0.5 (text "You lost"))
@@ -27,10 +32,4 @@ win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 
 screen :: Display
-screen = InWindow "Scene" (600, 600) (10, 10)
-
-structures :: Picture
-structures = Translate   40  0 zombie 
-          <> Translate (-40) 0 plant
-
-
+screen = InWindow "Scene" (1000, 1000) (10, 10)

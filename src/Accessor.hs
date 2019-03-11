@@ -40,3 +40,10 @@ pPicture _p = plant
 -- | Accessor for the sunflower
 sHealth :: Sunflower -> Int 
 sHealth _s = 10 
+
+sfPicture :: Sunflower -> Picture 
+sfPicture _sf = sunflower  
+
+-- | Accessor to render sun 
+sPicture :: Sun-> Picture
+sPicture _s = sun

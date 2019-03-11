@@ -109,7 +109,7 @@ updateUniverse dt u = u
   where
     newEnemies = updateZombies dt  (uDefense u) (uSunflowers u)   (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
-    newSunflower = updateSunflowers dt newTime (uSunflowers  u) 
+    newSunflower = updateSunflowers dt newTime (uEnemies u) (uSunflowers  u) 
     newTime = (uTime u) + dt
 
 
@@ -166,10 +166,12 @@ updateSunflowers dt newTime zs  = map (sendSun dt newTime ) .
     hasHealth s = (sDamage s) <= (sHealth  s)
                         
 sendSun :: Float -> Float -> Sunflower -> Sunflower
-sendSun dt newTime sf = ((round newTime) `mod` (13 :: Integer) == 0) &&  send
+sendSun dt newTime sf
+  | ((round newTime) `mod` (13 :: Integer) == 0) = send
+  | otherwise = sf
   where 
     send = sf {sSun = newSun} 
-    newSun = sun {sunCoords = (-75, 75)}
+    newSun = Sun (-75, 75)
     
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p

@@ -6,6 +6,7 @@ module Update where
 import Type
 import Accessor
 import Utils
+import AI
 
 -- | Function to update zombies
 updateZombies :: Float  ->  [Plant] -> [Sunflower] -> [Zombie] -> [Zombie]
@@ -66,6 +67,7 @@ sendSun newTime sf
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
+  | not (any (peaVision (pCoords p)) zs) = p
   | (floor newTime) `mod` (6 :: Integer) == 0 = shoot 
   | otherwise = p { pBullet = moveProjectile (movedBullet bullet) }
   where

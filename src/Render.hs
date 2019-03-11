@@ -42,10 +42,10 @@ drawSunflower sf = Translate  x y pic
   where 
     (x,   y) = sCoords sf
     sun = drawObject drawSun (sSun sf)
-    pic = color yellow (rectangleSolid 20 20)
+    pic = sunflower
 
 drawSun :: Sun -> Picture
 drawSun s = Translate x y pic
   where
     (x, y) = sunCoords s
-    pic = color yellow (circleSolid 5)
+    pic = sun

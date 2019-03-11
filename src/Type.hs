@@ -26,7 +26,16 @@ data Plant = Plant
 --  , pStrength ::        Int -- ^ strength of the plant
   , pBullet   :: Projectile -- ^ projectile of the plant
   }
+ 
+data Sunflower = Sunflower
+  { sCoords   ::     Coords -- ^ coordinates of Sunflower
+  , sDamage   ::        Int -- ^ health of the Sunflower 
+  , sSun      ::        Sun -- ^ sun of the Sunflower
+  }
 
+data Sun = Sun 
+  {  sunCoords   ::     Coords -- ^ coordinates of sun 
+  }
 data Projectile = Projectile
   { prX :: Float            -- ^ coordinates of projectile
   }
@@ -35,5 +44,6 @@ data Projectile = Projectile
 data Universe = Universe
   { uEnemies :: [Zombie]   -- ^ list of enemies
   , uDefense ::  [Plant]   -- ^ list of plants
+  , uSunflowers :: [Sunflower] -- ^ list of sunflowers 
   , uTime    ::    Float   -- ^ amount of time passed since start
   }

@@ -8,11 +8,11 @@ import Graphics.Gloss.Data.Bitmap
 import System.IO.Unsafe (unsafePerformIO)
 
 zombie :: Picture
-zombie = scale 0.1 0.1 (unsafePerformIO $ loadBMP "../images/basicZombie.bmp" )
+zombie = scale 0.1 0.1 (unsafePerformIO $ loadBMP "../images/Buckethead_Zombie.bmp" )
 
 plant :: Picture
 -- plant = color green (rectangleSolid 20 20)
-plant = scale 0.03 0.03 (unsafePerformIO $ loadBMP "../images/Peashooter.bmp" )
+plant = scale 0.025 0.025 (unsafePerformIO $ loadBMP "../images/Peashooter.bmp" )
 
 projectile :: Picture
 projectile = scale 0.5 0.5 (unsafePerformIO $ loadBMP "../images/ProjectilePea.bmp" )
@@ -21,7 +21,7 @@ sun :: Picture
 sun = scale 0.1 0.1 (unsafePerformIO $ loadBMP "../images/sun.bmp" )
 
 sunflower :: Picture 
-sunflower = scale 0.3 0.3 (unsafePerformIO $ loadBMP "../images/sunflower.bmp")
+sunflower = scale 0.03 0.03 (unsafePerformIO $ loadBMP "../images/sunflower.bmp")
 
 
 field :: Picture

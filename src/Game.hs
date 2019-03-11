@@ -28,7 +28,7 @@ samplePlants =
 -- | Predefined sunflowers structure
 sampleSunflowers :: [Sunflower]
 sampleSunflowers = 
-    [ Sunflower (-100, 100) 0 [Sun (-75, 75)]
+    [ Sunflower (-100, 100) 0 (Sun (-75, 75))
     ]
 
 -- | Starter universe
@@ -61,13 +61,23 @@ drawPlant p = Translate  x y pic
     (x,   y) = pCoords p
     px = prX (pBullet p)
     pic = pPicture (pType p)
+    
 
 
 drawSunflower :: Sunflower -> Picture 
 drawSunflower sf = Translate  x y pic
+                <> Translate sx sy sun
   where 
     (x,   y) = sCoords sf
+    (sx, sy) =  sunCoords (sSun sf)
+    sun = color yellow (circleSolid 5)
     pic = color yellow (rectangleSolid 20 20)
+    
+drawSun :: Sun -> Picture 
+drawSun s = Translate  x y pic
+  where 
+    (x, y) = sunCoords s
+    pic = color yellow (circleSolid 5)
 
 
 -- | Function to render universe
@@ -75,7 +85,6 @@ drawUniverse :: Universe -> Picture
 drawUniverse u = drawObject drawZombie zs
               <> drawObject drawSunflower sf
               <> drawObject drawPlant  ps
-
               <> field
   where
     zs = uEnemies u
@@ -93,13 +102,13 @@ updateUniverse :: Float -> Universe -> Universe
 updateUniverse dt u = u
   { uEnemies = newEnemies
   , uDefense = newDefense
- -- , uSunflower =  newSunflower
+--  , uSunflower =  newSunflower
   , uTime    = newTime
   }
   where
     newEnemies = updateZombies dt (uDefense u) (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
---    newSunflower = 
+--    newSunflower = updateSunflower dt newTime (uEnemies u) (uDefense u)
     newTime = (uTime u) + dt
 
 -- | Function to update zombies

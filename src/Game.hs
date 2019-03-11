@@ -29,7 +29,7 @@ samplePlants =
 -- | Predefined sunflowers structure
 sampleSunflowers :: [Sunflower]
 sampleSunflowers = 
-    [ Sunflower (-100, 100) 0 (Sun (-75, 75))
+    [ Sunflower (-100, 100) 0 [] 
     ]
 
 -- | Starter universe
@@ -65,24 +65,20 @@ drawPlant p = Translate  x y pic
     px = prX (pBullet p)
     pic = pPicture (pType p)
     
-
-
 drawSunflower :: Sunflower -> Picture 
 drawSunflower sf = Translate  x y pic
-                <> Translate sx sy sun
+                <> sun
   where 
     (x,   y) = sCoords sf
-    (sx, sy) =  sunCoords (sSun sf)
-    sun = color yellow (circleSolid 5)
+    sun = drawObject drawSun (sSun sf)
     pic = color yellow (rectangleSolid 20 20)
-    
-drawSun :: Sun -> Picture 
-drawSun s = Translate  x y pic
-  where 
+
+drawSun :: Sun -> Picture
+drawSun s = Translate x y pic
+  where
     (x, y) = sunCoords s
     pic = color yellow (circleSolid 5)
-
-
+    
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = field
@@ -178,20 +174,21 @@ updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
 
     
 updateSunflowers :: Float  -> Float -> [Zombie]  ->  [Sunflower] -> [Sunflower]
-updateSunflowers dt newTime zs  = map (sendSun dt newTime ) . 
+updateSunflowers dt newTime zs  = map (sendSun newTime ) . 
                           deleteSunflower .
                           attackSunflowers newTime zs  
   where 
     deleteSunflower sunflowers = filter (hasHealth) sunflowers
     hasHealth s = (sDamage s) <= (sHealth  s)
                         
-sendSun :: Float -> Float -> Sunflower -> Sunflower
-sendSun dt newTime sf
+sendSun :: Float -> Sunflower -> Sunflower
+sendSun newTime sf
   | ((round newTime) `mod` (13 :: Integer) == 0) = send
   | otherwise = sf
   where 
-    send = sf {sSun = newSun} 
+    send = sf {sSun = newSun : oldSuns} 
     newSun = Sun (-75, 75)
+    oldSuns = sSun sf
     
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p

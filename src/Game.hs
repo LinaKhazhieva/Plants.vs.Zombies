@@ -177,7 +177,7 @@ reduceHealthZombie dt (p:ps) z = reduce
       where 
         zXY = zCoords z
         prXY = (prX (moveBullet dt (prX  (pBullet p))), y )
-        (_x, y) = pCoords s 
+        (_x, y) = pCoords p
         newZombie = z 
             {zDamage = (zDamage z) + (pHealth (pType p)) }
 

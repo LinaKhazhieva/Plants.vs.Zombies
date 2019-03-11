@@ -4,6 +4,7 @@
 module Utils where
 
 import Type
+import Settings
 
 -- | Function to check collisions of hitboxes
 checkCollision :: Coords -> Coords -> Bool
@@ -18,4 +19,4 @@ checkCollision (x1, y1) (x2, y2)
     realY1 = y1 - (size / 2)
     realX2 = x2 - (size / 2)
     realY2 = y2 - (size / 2)
-    size   = 25
+    size   = boxSize

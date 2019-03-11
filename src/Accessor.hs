@@ -9,21 +9,22 @@ import Graphics.Gloss
 
 -- | Accessor for the speed of the zombies
 zSpeed :: ZombieType -> Float
-zSpeed ZombieOne = 4
-zSpeed ZombieTwo = 5
-zSpeed ZombieThree = 7
+zSpeed Basic = 6
+zSpeed Buckethead = 4
 
 -- | Accessor of the zombies health 
 zHealth :: ZombieType -> Int
-zHealth _z = 20
+zHealth Basic = 4
+zHealth Buckethead = 6
 
 -- | Accessor of the zombies strength
 zStrength :: ZombieType -> Int
-zStrength _z = 10
+zStrength _z = 1
 
 -- | Accessor to render zombie type
 zPicture :: ZombieType -> Picture
-zPicture _z = zombie
+zPicture Basic = basicZombie
+zPicture Buckethead = bucketheadZombie
 
 -- | Accessor for the plant
 pHealth :: PlantType -> Int
@@ -40,10 +41,3 @@ pPicture _p = plant
 -- | Accessor for the sunflower
 sHealth :: Sunflower -> Int 
 sHealth _s = 10 
-
-sfPicture :: Sunflower -> Picture 
-sfPicture _sf = sunflower  
-
--- | Accessor to render sun 
-sPicture :: Sun-> Picture
-sPicture _s = sun

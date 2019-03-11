@@ -4,6 +4,7 @@
 module GameOver where
 
 import Type
+import Settings
 
 isWon :: Universe -> Bool
 isWon u = length z == 0
@@ -16,4 +17,4 @@ isLost u = some
     some = True `elem` sms
     z = uEnemies u
     zXs = map (fst . zCoords) z
-    sms = map (\x -> x < -150) zXs
+    sms = map (\x -> x < begginnerCoords) zXs

@@ -47,7 +47,7 @@ updateUniverse dt u
   where
     newEnemies = updateZombies dt  (uDefense u) (uSunflowers u)   (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
-    newSunflower = updateSunflowers dt newTime (uEnemies u) (uSunflowers  u) 
+    newSunflower = updateSunflowers newTime (uEnemies u) (uSunflowers  u) 
     newTime = (uTime u) + dt
 
 perform :: IO()

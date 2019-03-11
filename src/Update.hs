@@ -11,9 +11,9 @@ import Utils
 updateZombies :: Float  ->  [Plant] -> [Sunflower] -> [Zombie] -> [Zombie]
 updateZombies dt ps sfs  = map (updateZombie dt ps sfs) . 
                         deleteZombie .
-                        attackZombies ps  
+                        attackZombies  
   where
-    attackZombies ps zs = map (reduceHealthZombie dt ps) zs  
+    attackZombies zs = map (reduceHealthZombie dt ps) zs  
     deleteZombie zombies = filter (hasHealth) zombies
     hasHealth z = (zDamage z) <= (zHealth (zType z)) 
 
@@ -46,8 +46,8 @@ updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
     deletePlant plants = filter (hasHealth) plants
     hasHealth p = (pDamage p) <= (pHealth (pType p))
 
-updateSunflowers :: Float  -> Float -> [Zombie]  ->  [Sunflower] -> [Sunflower]
-updateSunflowers dt newTime zs  = map (sendSun newTime ) . 
+updateSunflowers :: Float -> [Zombie]  ->  [Sunflower] -> [Sunflower]
+updateSunflowers newTime zs  = map (sendSun newTime ) . 
                           deleteSunflower .
                           attackSunflowers newTime zs  
   where 
@@ -59,8 +59,9 @@ sendSun newTime sf
   | ((round newTime) `mod` (13 :: Integer) == 0) = send
   | otherwise = sf
   where 
-    send = sf {sSun = newSun : oldSuns} 
-    newSun = Sun (-75, 75)
+    send = sf {sSun = newSun : oldSuns}
+    (x, y) = sCoords sf 
+    newSun = Sun (x + 50, y - 30)
     oldSuns = sSun sf
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
@@ -69,23 +70,22 @@ plantShoots dt newTime zs p
   | otherwise = p { pBullet = moveProjectile (movedBullet bullet) }
   where
    shoot = p { pBullet = newBullet : bullet }
-   newBullet = Projectile (-135)
+   newBullet = Projectile (x + 20, y)
    movedBullet b = map (moveBullet dt) b
    bullet = pBullet p
-   px = map prX bullet
-   (_x, y) = pCoords p
+   (x, y) = pCoords p
    moveProjectile [] = []
    moveProjectile (pr:prs)
      | True `elem` collisions = moveProjectile prs
      | otherwise = pr : moveProjectile prs
      where
        zombiesCoords = map (zCoords) zs
-       collisions = map (checkCollision (prX pr, y)) zombiesCoords
+       collisions = map (checkCollision (prCoords pr)) zombiesCoords
 
 moveBullet :: Float -> Projectile -> Projectile
-moveBullet dt projectile  = Projectile (px + dt*30)
+moveBullet dt projectile  = Projectile (x + dt*30, y)
   where
-    px = prX projectile
+    (x, y) = prCoords projectile
 
        
 -- | Function to lower health of plants
@@ -131,7 +131,7 @@ reduceHealthPlant (z:zs) p = reduce
 
 -- | Function to reduce health of zombie 
 reduceHealthZombie :: Float ->  [Plant] -> Zombie -> Zombie
-reduceHealthZombie dt [] z = z 
+reduceHealthZombie _dt [] z = z 
 reduceHealthZombie dt (p:ps) z = reduce
   where 
     reduce 
@@ -139,10 +139,8 @@ reduceHealthZombie dt (p:ps) z = reduce
       | otherwise = reduceHealthZombie dt ps z
       where 
         zXY = zCoords z
-        collisions = map (checkCollision (zCoords z)) prCoords
-        prCoords = zip (repeat y) (prXs (pBullet p))
-        prXs = map (prX) . map (moveBullet dt) 
-        (_x, y) = pCoords p 
+        collisions = map (checkCollision zXY) (prXYs (pBullet p))
+        prXYs = map (prCoords) . map (moveBullet dt) 
         newZombie = z 
             {zDamage = (zDamage z) + (pStrength (pType p)) }
 

@@ -24,24 +24,24 @@ drawZombie z = Translate x y pic
 -- | Function to render plant on the
 -- screen
 drawPlant :: Plant -> Picture
-drawPlant p = Translate  x y pic
+drawPlant p = Translate x y pic
            <> projectiles
   where
     (x,   y) = pCoords p
-    projectiles = drawObject (drawProjectile y) (pBullet p)
+    projectiles = drawObject (drawProjectile) (pBullet p)
     pic = pPicture (pType p)
 
-drawProjectile :: Float -> Projectile -> Picture
-drawProjectile y p = Translate x y projectile
+drawProjectile :: Projectile -> Picture
+drawProjectile p = Translate x (y + 5) projectile
   where
-    x = prX p
+    (x, y) = prCoords p
 
 drawSunflower :: Sunflower -> Picture 
 drawSunflower sf = Translate  x y pic
-                <> sun
+                <> s
   where 
     (x,   y) = sCoords sf
-    sun = drawObject drawSun (sSun sf)
+    s = drawObject drawSun (sSun sf)
     pic = sunflower
 
 drawSun :: Sun -> Picture

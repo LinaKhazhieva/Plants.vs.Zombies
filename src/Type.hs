@@ -8,10 +8,10 @@ import Graphics.Gloss
 type Coords = (Float, Float)
 
 -- | Data type to store different types of zombie
-data ZombieType = ZombieOne | ZombieTwo | ZombieThree
+data ZombieType = Basic | Buckethead
 
 -- | Data type to store different types of plant
-data PlantType = PlantOne | PlantTwo
+data PlantType = PeasShooter
 
 -- | Data type for Zombie
 data Zombie = Zombie
@@ -39,7 +39,7 @@ data Sun = Sun
   {  sunCoords   ::     Coords -- ^ coordinates of sun 
   }
 data Projectile = Projectile
-  { prX :: Float            -- ^ coordinates of projectile
+  { prCoords :: Coords            -- ^ coordinates of projectile
   }
 
 -- | Data type for whole Universe

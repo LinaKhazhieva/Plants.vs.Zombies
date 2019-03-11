@@ -20,6 +20,11 @@ field = line [(-200,  -50), (200,  -50)]
      <> line [(-200,   50), (200,   50)]
      <> line [(-200,  150), (200,  150)]
 
+lost :: Picture
+lost = Translate (-200) 0 (scale 0.5 0.5 (text "You lost"))
+
+win :: Picture
+win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 
 screen :: Display
 screen = InWindow "Scene" (400, 400) (10, 10)

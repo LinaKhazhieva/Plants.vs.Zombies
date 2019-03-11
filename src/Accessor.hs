@@ -15,7 +15,7 @@ zSpeed ZombieThree = 7
 
 -- | Accessor of the zombies health 
 zHealth :: ZombieType -> Int
-zHealth _z = 10
+zHealth _z = 20
 
 -- | Accessor of the zombies strength
 zStrength :: ZombieType -> Int
@@ -40,8 +40,3 @@ pPicture _p = plant
 -- | Accessor for the sunflower
 sHealth :: Sunflower -> Int 
 sHealth _s = 10 
-
--- | Accessor to render sunflower 
---sPicture :: Sunflower -> Picture 
---sPicture _s = sunFlower
-

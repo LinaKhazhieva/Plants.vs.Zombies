@@ -2,6 +2,8 @@
 
 module Type where
 
+import Graphics.Gloss
+
 -- | Type for coordinates on the field
 type Coords = (Float, Float)
 
@@ -44,6 +46,8 @@ data Projectile = Projectile
 data Universe = Universe
   { uEnemies :: [Zombie]   -- ^ list of enemies
   , uDefense ::  [Plant]   -- ^ list of plants
-  , uSunflowers :: [Sunflower] -- ^ list of sunflowers 
+  , uSunflowers :: [Sunflower] -- ^ list of sunflowers
+  , uOver :: Bool         -- ^ denotes if the game is over
   , uTime    ::    Float   -- ^ amount of time passed since start
+  , specialScreen :: Picture
   }

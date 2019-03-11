@@ -38,7 +38,9 @@ initUniverse = Universe
                sampleZombies
                samplePlants
                sampleSunflowers
+               False
                0
+               blank
 
 -- | High-level function to draw an object
 -- of the game on the screen
@@ -83,10 +85,11 @@ drawSun s = Translate  x y pic
 
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
-drawUniverse u = drawObject drawZombie zs
+drawUniverse u = field
+              <> drawObject drawZombie zs
               <> drawObject drawSunflower sf
               <> drawObject drawPlant  ps
-              <> field
+              <> specialScreen u
   where
     zs = uEnemies u
     ps = uDefense u
@@ -100,18 +103,35 @@ handleUniverse _e u = u
 -- | Function to change universe according
 -- to its rules by the time passed
 updateUniverse :: Float -> Universe -> Universe
-updateUniverse dt u = u
-  { uEnemies = newEnemies
-  , uDefense = newDefense
-  , uSunflowers =  newSunflower
-  , uTime    = newTime
-  }
+updateUniverse dt u
+  | isWon u = u
+         { specialScreen = win }
+  | isLost u = u
+         { specialScreen = lost }
+  | otherwise = u
+        { uEnemies = newEnemies
+        , uDefense = newDefense
+        , uSunflowers =  newSunflower
+        , uTime    = newTime
+        }
   where
     newEnemies = updateZombies dt  (uDefense u) (uSunflowers u)   (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
     newSunflower = updateSunflowers dt newTime (uEnemies u) (uSunflowers  u) 
     newTime = (uTime u) + dt
 
+isWon :: Universe -> Bool
+isWon u = length z == 0
+  where
+    z = uEnemies u
+
+isLost :: Universe -> Bool
+isLost u = some
+  where
+    some = True `elem` sms
+    z = uEnemies u
+    zXs = map (fst . zCoords) z
+    sms = map (\x -> x < -150) zXs
 
     
 -- | Function to update zombies

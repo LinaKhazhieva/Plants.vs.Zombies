@@ -5,8 +5,11 @@ module Structure.Object where
 
 import Graphics.Gloss
 
+zombieSize :: Float
+zombieSize = 10
+
 zombie :: Picture
-zombie = color (dark aquamarine) (circleSolid 10)
+zombie = color (dark aquamarine) (circleSolid zombieSize)
 
 plant :: Picture
 plant = color green (rectangleSolid 20 20)

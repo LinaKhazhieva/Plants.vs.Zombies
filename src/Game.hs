@@ -138,7 +138,7 @@ updateCards mouseCoords _cards
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
-  | not (any (peaVision (pCoords p)) zs) = p
+  | not (any (peaVision (pCoords p) screenWidth) zs) = p
   | (round newTime) `mod` (13 :: Integer) == 0 = shoot
   | otherwise = moveProjectile
   where

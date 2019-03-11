@@ -5,6 +5,12 @@ module Structure.Object where
 
 import Graphics.Gloss
 
+screenWidth :: Int
+screenWidth = 400
+
+screenHeight :: Int
+screenHeight = 500
+
 zombieSize :: Float
 zombieSize = 10
 
@@ -25,7 +31,7 @@ field = line [(-200,  -50), (200,  -50)]
 
 
 screen :: Display
-screen = InWindow "Scene" (400, 400) (10, 10)
+screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)
 
 structures :: Picture
 structures = Translate   40  0 zombie 

@@ -6,6 +6,8 @@ import Accessor
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import AI (peaVision)
+import UI (drawCards, cardsMarginX, cardsMarginY, cardWidth, cardHeight, initCards,
+          checkMouseClick, invertCardActive)
 
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
@@ -23,12 +25,18 @@ samplePlants =
   , Plant PlantOne (-150, -100) 0 (Projectile (-400))
   ]
 
+cards :: [Card]
+cards = initCards [PlantOne, PlantTwo] 
+  (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
+  fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
+
 -- | Starter universe
 initUniverse :: Universe
 initUniverse = Universe 
                sampleZombies
                samplePlants
                0
+               cards
 
 -- | High-level function to draw an object
 -- of the game on the screen
@@ -58,6 +66,7 @@ drawUniverse :: Universe -> Picture
 drawUniverse u = drawObject drawZombie zs
               <> drawObject drawPlant  ps
               <> field
+              <> drawCards (uCards u)
   where
     zs = uEnemies u
     ps = uDefense u
@@ -65,7 +74,9 @@ drawUniverse u = drawObject drawZombie zs
 -- | Function to change universe according
 -- to its rules by the interaction with the player
 handleUniverse :: Event -> Universe -> Universe
-handleUniverse _e u = u
+handleUniverse (EventKey (MouseButton LeftButton) Down _ mouseCoords) u = 
+  Universe (uEnemies u) (uDefense u) (uTime u) (updateCards mouseCoords (uCards u))
+handleUniverse _  u = u
 
 -- | Function to change universe according
 -- to its rules by the time passed
@@ -120,7 +131,10 @@ updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
     deletePlant plants = filter (hasHealth) plants
     hasHealth p = (pDamage p) <= (pHealth (pType p))
 
-
+updateCards :: Coords -> [Card] -> [Card]
+updateCards mouseCoords _cards
+  | any isActive _cards = cards
+  | otherwise = map (\c -> if checkMouseClick mouseCoords c then invertCardActive c else c) _cards
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p

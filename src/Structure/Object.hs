@@ -27,7 +27,7 @@ win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 
 screen :: Display
-screen = InWindow "Scene" (400, 400) (10, 10)
+screen = InWindow "Scene" (600, 600) (10, 10)
 
 structures :: Picture
 structures = Translate   40  0 zombie 

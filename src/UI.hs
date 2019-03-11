@@ -6,10 +6,10 @@ import Graphics.Gloss.Data.Picture
 import Type 
 
 cardWidth :: Float
-cardWidth = 60
+cardWidth = 50
 
 cardHeight :: Float
-cardHeight = 75
+cardHeight = 45
 
 cardLiningThickness :: Float
 cardLiningThickness = 3

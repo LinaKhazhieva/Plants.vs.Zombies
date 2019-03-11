@@ -33,6 +33,7 @@ data Plant = Plant
   , pDamage   ::        Int -- ^ health of the plant
 --  , pStrength ::        Int -- ^ strength of the plant
   , pBullet   :: [Projectile] -- ^ projectile of the plant
+  , sndMove :: Float
   }
  
 data Sunflower = Sunflower

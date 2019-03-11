@@ -73,14 +73,15 @@ drawSunflower sf = Translate  x y pic
   where 
     (x,   y) = sCoords sf
     (sx, sy) =  sunCoords (sSun sf)
-    sun = color yellow (circleSolid 5)
-    pic = color yellow (rectangleSolid 20 20)
+    sun = sPicture ( sSun  sf)
+    -- pic = color yellow (rectangleSolid 20 20)
+    pic = sfPicture (sf)
     
 drawSun :: Sun -> Picture 
 drawSun s = Translate  x y pic
   where 
     (x, y) = sunCoords s
-    pic = color yellow (circleSolid 5)
+    pic = sPicture (s)
 
 
 -- | Function to render universe

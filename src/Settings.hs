@@ -17,15 +17,15 @@ sampleZombies =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant PlantOne (-150,  100) 0 []
-  , Plant PlantOne (-150,    0) 0 []
-  , Plant PlantOne (-150, -100) 0 []
+  [ Plant PlantOne (-200,  100) 0 []
+  , Plant PlantOne (-200,    0) 0 []
+  , Plant PlantOne (-200, -100) 0 []
   ]
  
 -- | Predefined sunflowers structure
 sampleSunflowers :: [Sunflower]
 sampleSunflowers = 
-    [ Sunflower (-100, 100) 0 [] 
+    [ Sunflower (-150, 100) 0 [] 
     ]
 
 -- | Starter universe

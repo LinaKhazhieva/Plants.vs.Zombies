@@ -4,7 +4,10 @@
 module Settings where
 
 import Type
+import Structure.Object
 import Graphics.Gloss
+import AI 
+import UI
 
 begginnerCoords :: Float
 begginnerCoords = -200
@@ -34,6 +37,11 @@ sampleSunflowers =
     [ Sunflower (-160, 100) 0 [] 
     ]
 
+cards :: [Card]
+cards = initCards [PeasShooter] 
+  (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
+  fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
+
 -- | Starter universe
 initUniverse :: Universe
 initUniverse = Universe 
@@ -42,4 +50,5 @@ initUniverse = Universe
                sampleSunflowers
                False
                0
+               cards
                blank

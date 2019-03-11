@@ -1,10 +1,9 @@
 module UI where
 
-import Graphics.Gloss.Data.Color(Color, black, green, yellow)
-import Graphics.Gloss.Data.Picture (Picture, color, rectangleSolid, blank, translate, pictures)
+import Graphics.Gloss.Data.Color
+import Graphics.Gloss.Data.Picture 
 
-import Type (Card (Card), isActive, cardColor, plantType,
- PlantType (PlantOne, PlantTwo), Coords, cardCoords)
+import Type 
 
 cardWidth :: Float
 cardWidth = 60
@@ -41,8 +40,7 @@ drawCards [] = blank
 drawCards (c:cs) = drawCard c <> drawCards cs
 
 mapPlatTypeToCardColor :: PlantType -> Color
-mapPlatTypeToCardColor PlantOne = green
-mapPlatTypeToCardColor PlantTwo = yellow
+mapPlatTypeToCardColor PeasShooter = green
 
 initCards :: 
   [PlantType]

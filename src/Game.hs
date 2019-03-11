@@ -12,11 +12,6 @@ import AI (peaVision)
 import UI (drawCards, cardsMarginX, cardsMarginY, cardWidth, cardHeight, initCards,
           checkMouseClick, invertCardActive)
 
-cards :: [Card]
-cards = initCards [PlantOne, PlantTwo] 
-  (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
-  fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
-
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = field
@@ -34,7 +29,7 @@ drawUniverse u = field
 -- to its rules by the interaction with the player
 handleUniverse :: Event -> Universe -> Universe
 handleUniverse (EventKey (MouseButton LeftButton) Down _ mouseCoords) u = 
-  Universe (uEnemies u) (uDefense u) (uTime u) (updateCards mouseCoords (uCards u))
+  u { uCards = (updateCards mouseCoords (uCards u)) }
 handleUniverse _  u = u
 
 -- | Function to change universe according

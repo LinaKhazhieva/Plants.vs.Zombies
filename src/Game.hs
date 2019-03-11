@@ -21,9 +21,9 @@ sampleZombies =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant PlantOne (-150,  100) 0 (Projectile (-400))
-  , Plant PlantOne (-150,    0) 0 (Projectile (-400))
-  , Plant PlantOne (-150, -100) 0 (Projectile (-400))
+  [ Plant PlantOne (-150,  100) 0 []
+  , Plant PlantOne (-150,    0) 0 []
+  , Plant PlantOne (-150, -100) 0 []
   ]
  
 -- | Predefined sunflowers structure
@@ -59,11 +59,16 @@ drawZombie z = Translate x y pic
 -- screen
 drawPlant :: Plant -> Picture
 drawPlant p = Translate  x y pic
-           <> Translate px y projectile
+           <> projectiles
   where
     (x,   y) = pCoords p
-    px = prX (pBullet p)
+    projectiles = drawObject (drawProjectile y) (pBullet p)
     pic = pPicture (pType p)
+
+drawProjectile :: Float -> Projectile -> Picture
+drawProjectile y p = Translate x y projectile
+  where
+    x = prX p
     
 drawSunflower :: Sunflower -> Picture 
 drawSunflower sf = Translate  x y pic
@@ -192,24 +197,27 @@ sendSun newTime sf
     
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
-  | (round newTime) `mod` (13 :: Integer) == 0 = shoot
-  | otherwise = moveProjectile
+  | (round newTime) `mod` (6 :: Integer) == 0 = shoot
+  | otherwise = p { pBullet = moveProjectile movedBullet }
   where
-   shoot = p { pBullet = newBullet }
-   newBullet = bullet { prX = -135 }
-   movedBullet = bullet { prX = px + dt*30 }
+   shoot = p { pBullet = newBullet : bullet }
+   newBullet = Projectile (-135)
+   movedBullet = map (moveBullet dt) bullet
    bullet = pBullet p
-   px = prX bullet
+   px = map prX bullet
    (_x, y) = pCoords p
-   moveProjectile
-     | True `elem` collisions = p { pBullet = Projectile (-400) }
-     | otherwise = p { pBullet = movedBullet }
+   moveProjectile [] = []
+   moveProjectile (pr:prs)
+     | True `elem` collisions = moveProjectile prs
+     | otherwise = pr : moveProjectile prs
      where
        zombiesCoords = map (zCoords) zs
-       collisions = map (checkCollision (prX movedBullet, y)) zombiesCoords
+       collisions = map (checkCollision (prX pr, y)) zombiesCoords
  
-moveBullet :: Float -> Float -> Projectile
-moveBullet dt px  = Projectile (  px + dt*30 ) 
+moveBullet :: Float -> Projectile -> Projectile
+moveBullet dt projectile  = Projectile (px + dt*30)
+  where
+    px = prX projectile
 
        
 -- | Function to lower health of plants
@@ -259,11 +267,13 @@ reduceHealthZombie dt [] z = z
 reduceHealthZombie dt (p:ps) z = reduce
   where 
     reduce 
-      | checkCollision zXY prXY = reduceHealthZombie dt ps newZombie 
+      | True `elem` collisions = reduceHealthZombie dt ps newZombie 
       | otherwise = reduceHealthZombie dt ps z
       where 
         zXY = zCoords z
-        prXY = (prX (moveBullet dt (prX  (pBullet p))), y )
+        collisions = map (checkCollision (zCoords z)) prCoords
+        prCoords = zip (repeat y) (prXs (pBullet p))
+        prXs = map (prX) . map (moveBullet dt) 
         (_x, y) = pCoords p 
         newZombie = z 
             {zDamage = (zDamage z) + (pStrength (pType p)) }

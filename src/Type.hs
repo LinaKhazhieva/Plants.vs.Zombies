@@ -26,13 +26,13 @@ data Plant = Plant
   , pCoords   ::     Coords -- ^ coordinates of plants
   , pDamage   ::        Int -- ^ health of the plant
 --  , pStrength ::        Int -- ^ strength of the plant
-  , pBullet   :: Projectile -- ^ projectile of the plant
+  , pBullet   :: [Projectile] -- ^ projectile of the plant
   }
  
 data Sunflower = Sunflower
   { sCoords   ::     Coords -- ^ coordinates of Sunflower
   , sDamage   ::        Int -- ^ health of the Sunflower 
-  , sSun      ::        Sun -- ^ sun of the Sunflower
+  , sSun      ::      [Sun] -- ^ sun of the Sunflower
   }
 
 data Sun = Sun 

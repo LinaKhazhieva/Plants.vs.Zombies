@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
+
 module Main (main) where
 
 #ifndef MIN_VERSION_cabal_doctest

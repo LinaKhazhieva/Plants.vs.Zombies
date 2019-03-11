@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Accessor where
 
 import Type

@@ -1,6 +1,3 @@
-{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Game where
 
 import Structure.Object
@@ -11,7 +8,14 @@ import Render
 import Settings
 import GameOver
 import Update
+import AI (peaVision)
+import UI (drawCards, cardsMarginX, cardsMarginY, cardWidth, cardHeight, initCards,
+          checkMouseClick, invertCardActive)
 
+cards :: [Card]
+cards = initCards [PlantOne, PlantTwo] 
+  (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
+  fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
 
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
@@ -19,6 +23,7 @@ drawUniverse u = field
               <> drawObject drawZombie zs
               <> drawObject drawSunflower sf
               <> drawObject drawPlant  ps
+              <> drawCards (uCards u)
               <> specialScreen u
   where
     zs = uEnemies u
@@ -28,7 +33,9 @@ drawUniverse u = field
 -- | Function to change universe according
 -- to its rules by the interaction with the player
 handleUniverse :: Event -> Universe -> Universe
-handleUniverse _e u = u
+handleUniverse (EventKey (MouseButton LeftButton) Down _ mouseCoords) u = 
+  Universe (uEnemies u) (uDefense u) (uTime u) (updateCards mouseCoords (uCards u))
+handleUniverse _  u = u
 
 -- | Function to change universe according
 -- to its rules by the time passed
@@ -49,6 +56,11 @@ updateUniverse dt u
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
     newSunflower = updateSunflowers newTime (uEnemies u) (uSunflowers  u) 
     newTime = (uTime u) + dt
+
+updateCards :: Coords -> [Card] -> [Card]
+updateCards mouseCoords _cards
+  | any isActive _cards = cards
+  | otherwise = map (\c -> if checkMouseClick mouseCoords c then invertCardActive c else c) _cards
 
 perform :: IO()
 perform = play

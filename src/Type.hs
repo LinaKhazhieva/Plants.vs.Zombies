@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
-
 module Type where
 
 import Graphics.Gloss
@@ -19,6 +17,14 @@ data Zombie = Zombie
   , zCoords   :: Coords    -- ^ coordinates of zombie
   , zDamage   :: Int -- ^ heatlth of the zombie 
   }
+
+-- | One particular card
+data Card = Card {
+  cardColor :: Color, -- ^ Color of Card 
+  isActive :: Bool, -- ^ is Card currently chosen
+  plantType :: PlantType, -- ^ type of Plant to plant if Card is active
+  cardCoords :: Coords -- ^ Card coordinates
+}
 
 -- | Data type for Plants
 data Plant = Plant
@@ -49,5 +55,6 @@ data Universe = Universe
   , uSunflowers :: [Sunflower] -- ^ list of sunflowers
   , uOver :: Bool         -- ^ denotes if the game is over
   , uTime    ::    Float   -- ^ amount of time passed since start
+  , uCards   ::   [Card]   -- ^ cards of plants to plant  
   , specialScreen :: Picture
   }

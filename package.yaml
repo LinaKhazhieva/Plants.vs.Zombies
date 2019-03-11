@@ -29,10 +29,6 @@ ghc-options:
 dependencies:
 - base (>=4.8 && <4.13)
 - gloss == 1.13.*
-- JuicyPixels == 3.3.3
-- bytestring == 0.10.8.2
-- JuicyPixels-repa == 0.7.1.0
-- repa == 3.4.1.4
 
 library:
   source-dirs: src

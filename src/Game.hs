@@ -8,6 +8,7 @@ import Type
 import Accessor
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
+import Graphics.Gloss.Data.Bitmap
 
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
@@ -102,18 +103,20 @@ updateUniverse :: Float -> Universe -> Universe
 updateUniverse dt u = u
   { uEnemies = newEnemies
   , uDefense = newDefense
---  , uSunflower =  newSunflower
+  , uSunflowers =  newSunflower
   , uTime    = newTime
   }
   where
-    newEnemies = updateZombies dt (uDefense u) (uEnemies u)
+    newEnemies = updateZombies dt  (uDefense u) (uSunflowers u)   (uEnemies u)
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
---    newSunflower = updateSunflower dt newTime (uEnemies u) (uDefense u)
+    newSunflower = updateSunflowers dt newTime (uSunflowers  u) 
     newTime = (uTime u) + dt
 
+
+    
 -- | Function to update zombies
-updateZombies :: Float  ->  [Plant] -> [Zombie] -> [Zombie]
-updateZombies dt ps  = map (updateZombie dt ps) . 
+updateZombies :: Float  ->  [Plant] -> [Sunflower] -> [Zombie] -> [Zombie]
+updateZombies dt ps sfs  = map (updateZombie dt ps sfs) . 
                         deleteZombie .
                         attackZombies ps  
   where
@@ -123,13 +126,17 @@ updateZombies dt ps  = map (updateZombie dt ps) .
                         
 
 -- | Function to update one zombie
-updateZombie :: Float -> [Plant] -> Zombie -> Zombie
-updateZombie dt ps z
+updateZombie :: Float -> [Plant] -> [Sunflower] -> Zombie -> Zombie
+updateZombie dt ps sfs z
   | True `elem` collisions = z
   | otherwise              = moveZombie dt z
   where
     plantsCoords = map (pCoords) ps
-    collisions = map (checkCollision (zCoords z)) plantsCoords
+    sunflowersCoords = map (sCoords) sfs
+    collisions = map (checkCollision (zCoords z)) plantsCoords ++ sCollisions
+    sCollisions = map (checkCollision (zCoords z)) sunflowersCoords 
+
+
 
 -- | Function to move zombies
 moveZombie :: Float -> Zombie -> Zombie
@@ -149,8 +156,21 @@ updatePlants dt newTime zs = map (plantShoots dt newTime zs) .
     deletePlant plants = filter (hasHealth) plants
     hasHealth p = (pDamage p) <= (pHealth (pType p))
 
-
-
+    
+updateSunflowers :: Float  -> Float -> [Zombie]  ->  [Sunflower] -> [Sunflower]
+updateSunflowers dt newTime zs  = map (sendSun dt newTime ) . 
+                          deleteSunflower .
+                          attackSunflowers newTime zs  
+  where 
+    deleteSunflower sunflowers = filter (hasHealth) sunflowers
+    hasHealth s = (sDamage s) <= (sHealth  s)
+                        
+sendSun :: Float -> Float -> Sunflower -> Sunflower
+sendSun dt newTime sf = ((round newTime) `mod` (13 :: Integer) == 0) &&  send
+  where 
+    send = sf {sSun = newSun} 
+    newSun = sun {sunCoords = (-75, 75)}
+    
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
   | (round newTime) `mod` (13 :: Integer) == 0 = shoot
@@ -179,6 +199,27 @@ attackPlants dt zs ps
   | (floor dt) `mod` (6 :: Integer) == 0 = map (reduceHealthPlant zs) ps
   | otherwise = ps
 
+
+attackSunflowers ::  Float -> [Zombie] -> [Sunflower] -> [Sunflower]
+attackSunflowers dt zs sfs  
+  | (floor dt) `mod` (6 :: Integer) == 0 = map (reduceHealthSunflower zs) sfs
+  | otherwise = sfs 
+  
+
+reduceHealthSunflower :: [Zombie] -> Sunflower -> Sunflower
+reduceHealthSunflower  [] s = s 
+reduceHealthSunflower (z:zs) s = reduce
+  where
+    reduce
+      | checkCollision zXY sXY = reduceHealthSunflower zs newSunflower
+      | otherwise = reduceHealthSunflower zs s
+      where
+        zXY = zCoords z
+        sXY = sCoords s
+        newSunflower = s
+           { sDamage = (sDamage s) + (zStrength (zType z)) }
+   
+  
 -- | Function to reduce health of plant
 reduceHealthPlant :: [Zombie] -> Plant -> Plant
 reduceHealthPlant [] p = p
@@ -206,7 +247,7 @@ reduceHealthZombie dt (p:ps) z = reduce
         prXY = (prX (moveBullet dt (prX  (pBullet p))), y )
         (_x, y) = pCoords p 
         newZombie = z 
-            {zDamage = (zDamage z) + (pHealth (pType p)) }
+            {zDamage = (zDamage z) + (pStrength (pType p)) }
 
 -- | Function to check collisions of hitboxes
 checkCollision :: Coords -> Coords -> Bool

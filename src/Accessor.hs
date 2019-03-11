@@ -15,11 +15,11 @@ zSpeed ZombieThree = 7
 
 -- | Accessor of the zombies health 
 zHealth :: ZombieType -> Int
-zHealth _z = 1
+zHealth _z = 10
 
 -- | Accessor of the zombies strength
 zStrength :: ZombieType -> Int
-zStrength _z = 2
+zStrength _z = 10
 
 -- | Accessor to render zombie type
 zPicture :: ZombieType -> Picture

@@ -30,7 +30,7 @@ data Plant = Plant
 data Sunflower = Sunflower
   { sCoords   ::     Coords -- ^ coordinates of Sunflower
   , sDamage   ::        Int -- ^ health of the Sunflower 
-  , sSun      ::      Sun -- ^ sun of the Sunflower
+  , sSun      ::        Sun -- ^ sun of the Sunflower
   }
 
 data Sun = Sun 

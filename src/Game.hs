@@ -8,9 +8,7 @@ import Render
 import Settings
 import GameOver
 import Update
-import AI (peaVision)
-import UI (drawCards, cardsMarginX, cardsMarginY, cardWidth, cardHeight, initCards,
-          checkMouseClick, invertCardActive)
+import UI
 
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
@@ -51,11 +49,6 @@ updateUniverse dt u
     newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
     newSunflower = updateSunflowers newTime (uEnemies u) (uSunflowers  u) 
     newTime = (uTime u) + dt
-
-updateCards :: Coords -> [Card] -> [Card]
-updateCards mouseCoords _cards
-  | any isActive _cards = cards
-  | otherwise = map (\c -> if checkMouseClick mouseCoords c then invertCardActive c else c) _cards
 
 perform :: IO()
 perform = play

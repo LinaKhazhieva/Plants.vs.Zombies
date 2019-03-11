@@ -7,6 +7,14 @@ import Type
 import Accessor
 import Utils
 import AI
+import UI
+import Settings
+import Structure.Object
+
+updateCards :: Coords -> [Card] -> [Card]
+updateCards mouseCoords _cards
+  | any isActive _cards = cards
+  | otherwise = map (\c -> if checkMouseClick mouseCoords c then invertCardActive c else c) _cards
 
 -- | Function to update zombies
 updateZombies :: Float  ->  [Plant] -> [Sunflower] -> [Zombie] -> [Zombie]
@@ -67,7 +75,7 @@ sendSun newTime sf
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
 plantShoots dt newTime zs p
-  | not (any (peaVision (pCoords p)) zs) = p
+  | not (any (peaVision (pCoords p) screenWidth) zs) = p
   | (floor newTime) `mod` (6 :: Integer) == 0 = shoot 
   | otherwise = p { pBullet = moveProjectile (movedBullet bullet) }
   where
@@ -85,9 +93,9 @@ plantShoots dt newTime zs p
        collisions = map (checkCollision (prCoords pr)) zombiesCoords
 
 moveBullet :: Float -> Projectile -> Projectile
-moveBullet dt projectile  = Projectile (x + dt*30, y)
+moveBullet dt pr  = Projectile (x + dt*30, y)
   where
-    (x, y) = prCoords projectile
+    (x, y) = prCoords pr
 
        
 -- | Function to lower health of plants

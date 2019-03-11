@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
-
 module Type where
 
 -- | Type for coordinates on the field

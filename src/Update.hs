@@ -6,7 +6,6 @@ module Update where
 import Type
 import Utils
 import Settings
-import Structure.Object
 
 -- | High-level function to attack zombie/plants
 attack
@@ -27,7 +26,7 @@ updateZombies dt u = update zs
   where
     update = map (updateZombie dt u)
            . deleteZombie
-           . map (attackZombie dt u)
+           . map (attackZombie u)
     zs     = uEnemies u  
 
 -- | Function to update one zombie in terms of moving zombie
@@ -73,8 +72,8 @@ moveZombie dt z = z { zCoords = (x - dt * v, y) }
 -- | Function to lower health of zombies
 --   iterate through plants and lower health
 --   if collision with its projectile happened
-attackZombie :: Float -> Universe -> Zombie -> Zombie
-attackZombie dt u = attack (reduceHealthZombie dt) prs
+attackZombie :: Universe -> Zombie -> Zombie
+attackZombie u = attack reduceHealthZombie prs
   where
     prs = concat (map (\p -> 
           (zip (repeat (pStrength (pType p))) (pBullet p))) ps)
@@ -82,8 +81,8 @@ attackZombie dt u = attack (reduceHealthZombie dt) prs
 
 -- | Function to reduce health of zombie
 --   by checking the collision with the projectiles
-reduceHealthZombie :: Float -> (Int, Projectile) -> Zombie -> Zombie
-reduceHealthZombie dt (strength, pr) z
+reduceHealthZombie :: (Int, Projectile) -> Zombie -> Zombie
+reduceHealthZombie (strength, pr) z
   | checkCollision zXY prXY = newZombie 
   | otherwise = z
   where 
@@ -165,7 +164,7 @@ updateProjectiles dt u = update
 -- * otherwise lower time till shooting
 shootProjectile :: Float -> Universe -> Plant -> Plant
 shootProjectile dt u p
-  | not (any (peaVision (pCoords p) screenWidth) zs) = p
+  | not (any (peaVision (pCoords p)) zs) = p
                                           { pSeconds = 0 }
   | seconds <= 0                                     = p
                                           { pBullet  = shoot
@@ -186,12 +185,11 @@ shootProjectile dt u p
 --   only in the game border
 peaVision
   :: Coords -- ^ Coordinates of Pea's eyes
-  -> Int
   -> Zombie -- ^ Zombie to check
   -> Bool -- ^ True if sees Flase otherwise
-peaVision (_, y) screenBorder zombie = checkVision (zCoords zombie)
+peaVision (_, y) zombie = checkVision (zCoords zombie)
   where
-    checkVision (zX, zY) = y == zY && zX < fromIntegral screenBorder
+    checkVision (zX, zY) = y == zY && zX < endingCoords
 
 -- | Function to move projectiles of the plant, by the
 --   delta time * speed of the projectile

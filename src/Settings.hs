@@ -11,7 +11,7 @@ begginnerCoords :: Float
 begginnerCoords = -200
 
 endingCoords :: Float
-endingCoords = 200
+endingCoords = 150
 
 boxSize :: Float
 boxSize = 30
@@ -40,9 +40,9 @@ cardsMarginY = 10
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie Basic      (150,  100) 0 0 
-  , Zombie Buckethead (150,    0) 0 0
-  , Zombie Basic      (150, -100) 0 0
+  [ Zombie Basic      (450,  100) 0 0 
+  , Zombie Buckethead (450,    0) 0 0
+  , Zombie Basic      (450, -100) 0 0
   ]
 
 -- | Predefined defense structure

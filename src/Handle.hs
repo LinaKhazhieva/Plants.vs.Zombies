@@ -14,10 +14,16 @@ updateCards mouseCoords _cards
                            else c) _cards
 
 checkMouseClick :: Coords -> Card -> Bool
-checkMouseClick (mX, mY) card = mX >= cX - cardWidth / 2 && mX <= cX + cardWidth / 2 &&
-                                mY >= cY - cardHeight / 2 && mY <= cY + cardHeight / 2
+checkMouseClick (mX, mY) card = mX >= leftX && mX <= rightX &&
+                                mY >= leftY && mY <= rightY
   where
+    leftX    = cX - cardWidth / 2
+    rightX   = cX + cardWidth / 2
+    leftY    = cY - cardHeight / 2
+    rightY   = cY + cardHeight / 2
     (cX, cY) = cardCoords card
 
 invertCardActive :: Card -> Card 
-invertCardActive card = Card (cardColor card) (not (isActive card)) (plantType card) (cardCoords card)
+invertCardActive card = card { isActive = not active }
+  where
+    active = isActive card

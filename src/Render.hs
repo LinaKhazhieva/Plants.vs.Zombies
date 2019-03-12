@@ -6,7 +6,7 @@ module Render where
 import Graphics.Gloss
 import Type
 import Structure.Object
-import Accessor
+import Settings
 
 -- | High-level function to draw an object
 -- of the game on the screen
@@ -49,3 +49,12 @@ drawSun s = Translate x y pic
   where
     (x, y) = sunCoords s
     pic = sun
+
+drawCard :: Card -> Picture
+drawCard card = translate x y
+                (pictures [if (isActive card) then drawLining else blank, 
+                color (cardColor card) (rectangleSolid cardWidth cardHeight)])
+  where
+    drawLining = color cardLiningColor 
+      (rectangleSolid (cardWidth + cardLiningThickness * 2) (cardHeight + cardLiningThickness * 2))
+    (x, y) = cardCoords card

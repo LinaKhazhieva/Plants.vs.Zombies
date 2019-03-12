@@ -6,22 +6,23 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Render
 import Settings
-import GameOver
+import Utils
 import Update
-import UI
+import Handle
 
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = field
               <> drawObject drawZombie zs
-              <> drawObject drawSunflower sf
+              <> drawObject drawSunflower sfs
               <> drawObject drawPlant  ps
-              <> drawCards (uCards u)
-              <> specialScreen u
+              <> drawObject drawCard cs 
+              <> uScreen u
   where
-    zs = uEnemies u
-    ps = uDefense u
-    sf = uSunflowers u
+    zs  = uEnemies u
+    ps  = uDefense u
+    sfs = uSunflowers u
+    cs  = uCards u
 
 -- | Function to change universe according
 -- to its rules by the interaction with the player
@@ -35,9 +36,9 @@ handleUniverse _  u = u
 updateUniverse :: Float -> Universe -> Universe
 updateUniverse dt u
   | isWon u = u
-         { specialScreen = win }
+         { uScreen = win }
   | isLost u = u
-         { specialScreen = lost }
+         { uScreen = lost }
   | otherwise = u
         { uEnemies = newEnemies
         , uDefense = newDefense
@@ -45,9 +46,9 @@ updateUniverse dt u
         , uTime    = newTime
         }
   where
-    newEnemies = updateZombies dt  (uDefense u) (uSunflowers u)   (uEnemies u)
-    newDefense = updatePlants dt (uTime u) (uEnemies u) (uDefense u)
-    newSunflower = updateSunflowers newTime (uEnemies u) (uSunflowers  u) 
+    newEnemies = updateZombies dt u 
+    newDefense = updatePlants dt u 
+    newSunflower = updateSunflowers dt u 
     newTime = (uTime u) + dt
 
 perform :: IO()

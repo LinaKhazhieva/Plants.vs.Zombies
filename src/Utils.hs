@@ -20,3 +20,16 @@ checkCollision (x1, y1) (x2, y2)
     realX2 = x2 - (size / 2)
     realY2 = y2 - (size / 2)
     size   = boxSize
+
+isWon :: Universe -> Bool
+isWon u = length z == 0
+  where
+    z = uEnemies u
+
+isLost :: Universe -> Bool
+isLost u = some
+  where
+    some = True `elem` sms
+    z = uEnemies u
+    zXs = map (fst . zCoords) z
+    sms = map (\x -> x < begginnerCoords) zXs

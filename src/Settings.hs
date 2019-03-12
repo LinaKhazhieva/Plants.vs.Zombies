@@ -6,21 +6,43 @@ module Settings where
 import Type
 import Structure.Object
 import Graphics.Gloss
-import AI 
-import UI
 
 begginnerCoords :: Float
 begginnerCoords = -200
 
+endingCoords :: Float
+endingCoords = 200
+
 boxSize :: Float
 boxSize = 30
+
+cardWidth :: Float
+cardWidth = 50
+
+cardHeight :: Float
+cardHeight = 45
+
+cardLiningThickness :: Float
+cardLiningThickness = 3
+
+cardLiningColor :: Color
+cardLiningColor = black
+
+cardsDistance :: Float
+cardsDistance = 20
+
+cardsMarginX :: Float
+cardsMarginX = 50
+
+cardsMarginY :: Float
+cardsMarginY = 10
 
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie Basic (150,  100) 0 
-  , Zombie Buckethead (150,    0) 0 
-  , Zombie Basic (150, -100) 0
+  [ Zombie Basic      (150,  100) 0 0 
+  , Zombie Buckethead (150,    0) 0 0
+  , Zombie Basic      (150, -100) 0 0
   ]
 
 -- | Predefined defense structure
@@ -34,7 +56,7 @@ samplePlants =
 -- | Predefined sunflowers structure
 sampleSunflowers :: [Sunflower]
 sampleSunflowers = 
-    [ Sunflower (-160, 100) 0 [] 
+    [ Sunflower (-160, 100) 0 [] 4
     ]
 
 cards :: [Card]
@@ -42,13 +64,20 @@ cards = initCards [PeasShooter]
   (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
   fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
 
+initCards :: 
+  [PlantType]
+  -> Coords -- ^ Coordinatates of the first card
+  -> [Card]
+initCards [] _ = []
+initCards (p:ps) (x, y) = [Card (pCardColor p) False p (x, y)] ++ initCards ps (x + cardWidth + cardsDistance, y)
+
 -- | Starter universe
 initUniverse :: Universe
 initUniverse = Universe 
                sampleZombies
                samplePlants
                sampleSunflowers
-               False
-               0
                cards
                blank
+               False
+               0

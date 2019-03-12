@@ -32,7 +32,7 @@ drawPlant p = Translate x y pic
     pic = pPicture (pType p)
 
 drawProjectile :: Projectile -> Picture
-drawProjectile p = Translate x (y + 5) projectile
+drawProjectile p = Translate x (y + deltaYProjectile) projectile
   where
     (x, y) = prCoords p
 

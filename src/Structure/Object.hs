@@ -6,40 +6,52 @@ module Structure.Object where
 import Graphics.Gloss
 import System.IO.Unsafe (unsafePerformIO)
 
+loadPicture :: String -> Picture
+loadPicture path = unsafePerformIO $ loadBMP path
+
 screenWidth :: Int
-screenWidth = 600
+screenWidth = 1400
 
 screenHeight :: Int
-screenHeight = 400
-
-zombieSize :: Float
-zombieSize = 10
+screenHeight = 600
 
 bucketheadZombie :: Picture
-bucketheadZombie = scale 0.1 0.1 (unsafePerformIO $ loadBMP "images/Buckethead_Zombie.bmp" )
+bucketheadZombie = scale 0.5 0.5 pic
+  where
+    pic = loadPicture "images/buckethead.bmp"
 
 basicZombie :: Picture
-basicZombie = scale 0.025 0.025 (unsafePerformIO $ loadBMP "images/zombiebasic.bmp")
-
+basicZombie = scale 0.5 0.5 pic
+  where
+    pic = loadPicture "images/zombiebasic.bmp"
 
 plant :: Picture
-plant = scale 0.025 0.025 (unsafePerformIO $ loadBMP "images/Peashooter.bmp" )
+plant = pic
+  where
+    pic = loadPicture "images/peasshooter.bmp"
 
 projectile :: Picture
-projectile = scale 0.5 0.5 (unsafePerformIO $ loadBMP "images/ProjectilePea.bmp" )
+projectile = pic
+  where
+    pic = loadPicture "images/ProjectilePea.bmp"
 
 sun :: Picture 
-sun = scale 0.1 0.1 (unsafePerformIO $ loadBMP "images/sun.bmp" )
+sun = scale 0.5 0.5 pic
+  where
+    pic = loadPicture "images/sun.bmp"
 
 sunflower :: Picture 
-sunflower = scale 0.03 0.03 (unsafePerformIO $ loadBMP "images/sunflower.bmp")
+sunflower = pic
+  where
+    pic = loadPicture "images/sunflower.bmp"
 
 screen :: Display
 screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)
 
 field :: Picture
-field = scale 0.5 0.5  (unsafePerformIO $ loadBMP "images/Background.bmp" )
-
+field = pic
+  where
+    pic = unsafePerformIO $ loadBMP "images/Background.bmp"
 
 lost :: Picture
 lost = Translate (-200) 0 (scale 0.5 0.5 (text "You lost"))

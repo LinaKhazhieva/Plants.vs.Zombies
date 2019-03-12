@@ -8,10 +8,10 @@ import Structure.Object
 import Graphics.Gloss
 
 begginnerCoords :: Float
-begginnerCoords = -200
+begginnerCoords = -450
 
 endingCoords :: Float
-endingCoords = 150
+endingCoords = 300
 
 boxSize :: Float
 boxSize = 30
@@ -37,26 +37,47 @@ cardsMarginX = 50
 cardsMarginY :: Float
 cardsMarginY = 10
 
+zombieWidth :: Float
+zombieWidth = 115
+
+zombieHeight :: Float
+zombieHeight = 200
+
+plantWidth :: Float
+plantWidth = 80
+
+plantHeight :: Float
+plantHeight = 80
+
+peasSize :: Float
+peasSize = 20
+
+deltaYProjectile :: Float
+deltaYProjectile = 15
+
+deltaXProjectile :: Float
+deltaXProjectile = 40
+
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie Basic      (450,  100) 0 0 
-  , Zombie Buckethead (450,    0) 0 0
-  , Zombie Basic      (450, -100) 0 0
+  [ Zombie Basic      (300,  150) 0 0 
+  , Zombie Buckethead (300,   50) 0 0
+  , Zombie Basic      (300,  -50) 0 0
   ]
 
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant PeasShooter (-200,  100) 0 [] 0
-  , Plant PeasShooter (-200,    0) 0 [] 0
-  , Plant PeasShooter (-200, -100) 0 [] 0
+  [ Plant PeasShooter (-400,  100) 0 [] 0
+  , Plant PeasShooter (-400,    0) 0 [] 0
+  , Plant PeasShooter (-400, -100) 0 [] 0
   ]
  
 -- | Predefined sunflowers structure
 sampleSunflowers :: [Sunflower]
 sampleSunflowers = 
-    [ Sunflower (-160, 100) 0 [] 4
+    [ Sunflower (-330, 100) 0 [] 4
     ]
 
 cards :: [Card]

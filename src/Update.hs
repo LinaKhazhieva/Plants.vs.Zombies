@@ -16,6 +16,14 @@ attack
 attack _f [] b      = b
 attack f (x : xs) b = attack f xs (f x b)
 
+collisionPlantZombie :: Coords -> Coords -> Bool
+collisionPlantZombie z p = checkCollision zombieWidth zombieHeight
+                           plantWidth plantHeight z p
+
+collisionPeasZombie :: Coords -> Coords -> Bool
+collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
+                           zombieWidth (zombieHeight / 2) pr (x, y-50)
+
 -- | Function to perform updates on zombie, according
 -- to time passed in the game. Move zombie, if there's
 -- no collision with the plant, reduce health of the
@@ -26,7 +34,7 @@ updateZombies dt u = update zs
   where
     update = map (updateZombie dt u)
            . deleteZombie
-           . map (attackZombie u)
+           . map (attackZombie dt u)
     zs     = uEnemies u  
 
 -- | Function to update one zombie in terms of moving zombie
@@ -43,8 +51,8 @@ updateZombie dt u z
     sunflowersXY = map (sCoords) (uSunflowers u)
     collisions   = pCollisions ++ sCollisions
       where
-        pCollisions = map (checkCollision (zCoords z)) plantsXY
-        sCollisions = map (checkCollision (zCoords z)) sunflowersXY
+        pCollisions = map (collisionPlantZombie (zCoords z)) plantsXY
+        sCollisions = map (collisionPlantZombie (zCoords z)) sunflowersXY
 
 -- | Function to bite plant
 --   lowers seconds till the bite, if they are larger than 0
@@ -72,8 +80,8 @@ moveZombie dt z = z { zCoords = (x - dt * v, y) }
 -- | Function to lower health of zombies
 --   iterate through plants and lower health
 --   if collision with its projectile happened
-attackZombie :: Universe -> Zombie -> Zombie
-attackZombie u = attack reduceHealthZombie prs
+attackZombie :: Float -> Universe -> Zombie -> Zombie
+attackZombie dt u = attack (reduceHealthZombie dt) prs
   where
     prs = concat (map (\p -> 
           (zip (repeat (pStrength (pType p))) (pBullet p))) ps)
@@ -81,13 +89,13 @@ attackZombie u = attack reduceHealthZombie prs
 
 -- | Function to reduce health of zombie
 --   by checking the collision with the projectiles
-reduceHealthZombie :: (Int, Projectile) -> Zombie -> Zombie
-reduceHealthZombie (strength, pr) z
-  | checkCollision zXY prXY = newZombie 
-  | otherwise = z
+reduceHealthZombie :: Float -> (Int, Projectile) -> Zombie -> Zombie
+reduceHealthZombie dt (strength, pr) z
+  | collisionPeasZombie prXY zXY = newZombie 
+  | otherwise                    = z
   where 
     zXY        = zCoords z
-    prXY       = prCoords pr
+    prXY       = prCoords (moveProjectile dt pr)
     newZombie  = z 
      { zDamage = zDamage z + strength }
 
@@ -127,7 +135,7 @@ attackPlant u = attack reduceHealthPlant zs
 --   till bite is up
 reduceHealthPlant :: Zombie -> Plant -> Plant
 reduceHealthPlant z p
-  | not (checkCollision zXY pXY) = p
+  | not (collisionPlantZombie zXY pXY) = p
   | seconds <= 0                 = newP
   | otherwise                    = p
   where
@@ -175,7 +183,7 @@ shootProjectile dt u p
   where
     shoot     = newBullet : bullet
     seconds   = pSeconds p - dt 
-    newBullet = Projectile (x + 20, y)
+    newBullet = Projectile (x + deltaXProjectile, y)
     (x, y)    = pCoords p
     bullet    = pBullet p
     zs        = uEnemies u
@@ -187,9 +195,10 @@ peaVision
   :: Coords -- ^ Coordinates of Pea's eyes
   -> Zombie -- ^ Zombie to check
   -> Bool -- ^ True if sees Flase otherwise
-peaVision (_, y) zombie = checkVision (zCoords zombie)
+peaVision (_, y) zombie = checkVision
   where
-    checkVision (zX, zY) = y == zY && zX < endingCoords
+    checkVision = y == zY - 50 && zX < endingCoords
+    (zX, zY)    = zCoords zombie   
 
 -- | Function to move projectiles of the plant, by the
 --   delta time * speed of the projectile
@@ -200,7 +209,7 @@ moveProjectiles dt p = p { pBullet = move }
     b    = pBullet p
 
 moveProjectile :: Float -> Projectile -> Projectile
-moveProjectile dt pr = Projectile (x + dt * 30, y)
+moveProjectile dt pr = Projectile (x + dt * 50, y)
   where
     (x, y) = prCoords pr
 
@@ -218,7 +227,7 @@ deleteProjectile u p = p { pBullet = delete prs }
     hasCollision pr = not (True `elem` collisions)
       where
         zombiesXY  = map (zCoords) zs
-        collisions = map (checkCollision (prCoords pr)) zombiesXY
+        collisions = map (collisionPeasZombie (prCoords pr)) zombiesXY
 
 -- | Function to update sunflower by the time passed
 -- * produce sun
@@ -248,7 +257,7 @@ sendSun dt sf
     seconds = sSeconds sf - dt
     send    = newSun : oldSuns
     (x, y)  = sCoords sf 
-    newSun  = Sun (x + 50, y - 30)
+    newSun  = Sun (x + 70, y - 30)
     oldSuns = sSun sf
 
 -- | Function to lower health of sunflowers
@@ -265,7 +274,7 @@ attackSunflower u sf = attack reduceHealthSunflower zs sf
 --   till bite is up
 reduceHealthSunflower :: Zombie -> Sunflower -> Sunflower
 reduceHealthSunflower z sf
-  | not (checkCollision zXY sfXY) = sf
+  | not (collisionPlantZombie zXY sfXY) = sf
   | seconds <= 0                  = newSf
   | otherwise      = sf
   where

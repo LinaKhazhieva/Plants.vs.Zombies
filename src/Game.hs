@@ -46,7 +46,7 @@ updateUniverse dt u
         }
   where
     newEnemies = updateZombies dt  (uDefense u) (uSunflowers u)   (uEnemies u)
-    newDefense = updatePlants dt newTime (uEnemies u) (uDefense u)
+    newDefense = updatePlants dt (uTime u) (uEnemies u) (uDefense u)
     newSunflower = updateSunflowers newTime (uEnemies u) (uSunflowers  u) 
     newTime = (uTime u) + dt
 

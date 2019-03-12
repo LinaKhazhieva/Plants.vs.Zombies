@@ -74,12 +74,17 @@ sendSun newTime sf
     oldSuns = sSun sf
 
 plantShoots :: Float -> Float -> [Zombie] -> Plant -> Plant
-plantShoots dt newTime zs p
-  | not (any (peaVision (pCoords p) screenWidth) zs) = p
-  | (floor newTime) `mod` (6 :: Integer) == 0 = shoot 
-  | otherwise = p { pBullet = moveProjectile (movedBullet bullet) }
+plantShoots dt _newTime zs p
+  | not (any (peaVision (pCoords p) screenWidth) zs) = p { pBullet = []
+                                                         , sndMove = 0}
+  | seconds <= 0 = p { pBullet = shoot,
+                     sndMove = 5 } 
+  | otherwise = p { pBullet = moveProjectile (movedBullet bullet)
+                  , sndMove = seconds
+		  }
   where
-   shoot = p { pBullet = newBullet : bullet }
+   seconds = (sndMove p) - dt
+   shoot = newBullet : (moveProjectile (movedBullet bullet))
    newBullet = Projectile (x + 20, y)
    movedBullet b = map (moveBullet dt) b
    bullet = pBullet p

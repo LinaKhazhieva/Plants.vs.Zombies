@@ -47,12 +47,8 @@ updateZombie dt u z
   | True `elem` collisions = bitePlant dt z
   | otherwise              = moveZombie dt z
   where
-    plantsXY     = map (pCoords) (uDefense u)
-    sunflowersXY = map (sCoords) (uSunflowers u)
-    collisions   = pCollisions ++ sCollisions
-      where
-        pCollisions = map (collisionPlantZombie (zCoords z)) plantsXY
-        sCollisions = map (collisionPlantZombie (zCoords z)) sunflowersXY
+    plantsXY     = map (pCoords) (uDefense u)    
+    collisions   = map (collisionPlantZombie (zCoords z)) plantsXY     
 
 -- | Function to bite plant
 --   lowers seconds till the bite, if they are larger than 0
@@ -83,8 +79,9 @@ moveZombie dt z = z { zCoords = (x - dt * v, y) }
 attackZombie :: Float -> Universe -> Zombie -> Zombie
 attackZombie dt u = attack (reduceHealthZombie dt) prs
   where
+    newP = filter (\p -> (pType p) == PeasShooter) ps
     prs = concat (map (\p -> 
-          (zip (repeat (pStrength (pType p))) (pBullet p))) ps)
+          (zip (repeat (pStrength (pType p))) (pBullet p))) newP)
     ps  = uDefense u
 
 -- | Function to reduce health of zombie
@@ -136,8 +133,8 @@ attackPlant u = attack reduceHealthPlant zs
 reduceHealthPlant :: Zombie -> Plant -> Plant
 reduceHealthPlant z p
   | not (collisionPlantZombie zXY pXY) = p
-  | seconds <= 0                 = newP
-  | otherwise                    = p
+  | seconds <= 0                       = newP
+  | otherwise                          = p
   where
     seconds     = zSeconds z
     zXY         = zCoords z
@@ -158,11 +155,15 @@ deletePlant ps = filter (hasHealth) ps
 -- * Perform moving projectile along x-axis
 -- * Perform deleting projectile
 updateProjectiles :: Float -> Universe -> [Plant] -> [Plant]
-updateProjectiles dt u = update
+updateProjectiles dt u = map updProjectile
   where
-    update = map (shootProjectile dt u)
-           . map (moveProjectiles dt)
-           . map (deleteProjectile u)
+    updProjectile p
+      | (pType p) == PeasShooter = update p
+      | otherwise                = sendSun dt p
+      where
+        update = shootProjectile dt u
+               . moveProjectiles dt
+               . deleteProjectile u
     
 -- | Function to shoot projectile
 -- * if there's no zombie in pea vision -> no shooting performed
@@ -176,14 +177,14 @@ shootProjectile dt u p
                                           { pSeconds = 0 }
   | seconds <= 0                                     = p
                                           { pBullet  = shoot
-                                          , pSeconds = 5
+                                          , pSeconds = pFrequency (pType p)
                                           }
   | otherwise                                        = p
                                           { pSeconds = seconds }
   where
     shoot     = newBullet : bullet
     seconds   = pSeconds p - dt 
-    newBullet = Projectile (x + deltaXProjectile, y)
+    newBullet = Projectile Pea (x + deltaXProjectile, y)
     (x, y)    = pCoords p
     bullet    = pBullet p
     zs        = uEnemies u
@@ -209,7 +210,7 @@ moveProjectiles dt p = p { pBullet = move }
     b    = pBullet p
 
 moveProjectile :: Float -> Projectile -> Projectile
-moveProjectile dt pr = Projectile (x + dt * 50, y)
+moveProjectile dt pr = Projectile Pea (x + dt * 50, y)
   where
     (x, y) = prCoords pr
 
@@ -229,65 +230,21 @@ deleteProjectile u p = p { pBullet = delete prs }
         zombiesXY  = map (zCoords) zs
         collisions = map (collisionPeasZombie (prCoords pr)) zombiesXY
 
--- | Function to update sunflower by the time passed
--- * produce sun
--- * reduce health of the sunflower
--- * delete sunflower
-updateSunflowers :: Float -> Universe -> [Sunflower]
-updateSunflowers dt u = update sfs  
-  where
-    update = map (sendSun dt)
-           . deleteSunflower
-           . map (attackSunflower u)
-    sfs    = uSunflowers u
-
 -- | Function that produces sun from sunflower
 -- * if seconds left is less than zero ->
 --   produce sun
 -- * otherwise lower time till creation of sun
-sendSun :: Float -> Sunflower -> Sunflower
-sendSun dt sf
-  | seconds <= 0 = sf
-      { sSun     = send
-      , sSeconds = 5
+sendSun :: Float -> Plant -> Plant
+sendSun dt p
+  | seconds <= 0 = p
+      { pBullet  = send
+      , pSeconds = (pFrequency (pType p))
       }
-  | otherwise    = sf
-      { sSeconds = seconds }
+  | otherwise    = p
+      { pSeconds = seconds }
   where
-    seconds = sSeconds sf - dt
+    seconds = pSeconds p - dt
     send    = newSun : oldSuns
-    (x, y)  = sCoords sf 
-    newSun  = Sun (x + 70, y - 30)
-    oldSuns = sSun sf
-
--- | Function to lower health of sunflowers
---   iterate through zombies and lower health
---   if their timer for bite is exceed
-attackSunflower :: Universe -> Sunflower -> Sunflower
-attackSunflower u sf = attack reduceHealthSunflower zs sf
-  where
-    zs = uEnemies u
-
--- | Function to reduce health of sunflower
---   reduce health of the sunflower if there's
---   collision with zombie and their timer
---   till bite is up
-reduceHealthSunflower :: Zombie -> Sunflower -> Sunflower
-reduceHealthSunflower z sf
-  | not (collisionPlantZombie zXY sfXY) = sf
-  | seconds <= 0                  = newSf
-  | otherwise      = sf
-  where
-    seconds     = zSeconds z
-    zXY         = zCoords z
-    sfXY        = sCoords sf
-    newSf       = sf
-      { sDamage = (sDamage sf) + (zStrength (zType z)) }
-
--- | Function to remove sunflower from the game
---   if its health is less than the damage the
---   current sunflower received.
-deleteSunflower :: [Sunflower] -> [Sunflower]
-deleteSunflower = filter (hasHealth)
-  where
-    hasHealth s = (sDamage s) <= (sHealth  s)
+    (x, y)  = pCoords p 
+    newSun  = Projectile Sun (x + 70, y - 25)
+    oldSuns = pBullet p

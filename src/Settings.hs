@@ -72,16 +72,11 @@ samplePlants =
   [ Plant PeasShooter (-400,  100) 0 [] 0
   , Plant PeasShooter (-400,    0) 0 [] 0
   , Plant PeasShooter (-400, -100) 0 [] 0
+  , Plant Sunflower   (-330, 100)  0 [] 4
   ]
  
--- | Predefined sunflowers structure
-sampleSunflowers :: [Sunflower]
-sampleSunflowers = 
-    [ Sunflower (-330, 100) 0 [] 4
-    ]
-
 cards :: [Card]
-cards = initCards [PeasShooter] 
+cards = initCards [PeasShooter, Sunflower] 
   (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
   fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
 
@@ -97,7 +92,6 @@ initUniverse :: Universe
 initUniverse = Universe 
                sampleZombies
                samplePlants
-               sampleSunflowers
                cards
                blank
                False

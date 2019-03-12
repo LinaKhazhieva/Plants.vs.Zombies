@@ -5,7 +5,6 @@ module Render where
 
 import Graphics.Gloss
 import Type
-import Structure.Object
 import Settings
 
 -- | High-level function to draw an object
@@ -25,30 +24,20 @@ drawZombie z = Translate x y pic
 -- screen
 drawPlant :: Plant -> Picture
 drawPlant p = Translate x y pic
-           <> projectiles
   where
     (x,   y) = pCoords p
-    projectiles = drawObject (drawProjectile) (pBullet p)
     pic = pPicture (pType p)
 
 drawProjectile :: Projectile -> Picture
-drawProjectile p = Translate x (y + deltaYProjectile) projectile
+drawProjectile pr = Translate x (y + deltaYProjectile) pic
   where
-    (x, y) = prCoords p
+    (x, y) = prCoords pr
+    pic    = prPicture (prType pr)
 
-drawSunflower :: Sunflower -> Picture 
-drawSunflower sf = Translate  x y pic
-                <> s
-  where 
-    (x,   y) = sCoords sf
-    s = drawObject drawSun (sSun sf)
-    pic = sunflower
-
-drawSun :: Sun -> Picture
-drawSun s = Translate x y pic
+drawProjectiles :: ProjectileType -> [Projectile] -> Picture
+drawProjectiles t prs = drawObject drawProjectile newPrs
   where
-    (x, y) = sunCoords s
-    pic = sun
+    newPrs = filter (\pr -> (prType pr) == t) prs
 
 drawCard :: Card -> Picture
 drawCard card = translate x y

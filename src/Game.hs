@@ -17,13 +17,15 @@ drawUniverse u = field
               <> drawProjectiles Sun prs
               <> drawProjectiles Pea prs
               <> drawObject drawZombie zs
-              <> drawObject drawCard cs 
+              <> drawObject drawCard cs
+              <> drawMoney m 
               <> uScreen u
   where
     prs = concat (map pBullet ps)
     zs  = uEnemies u
     ps  = uDefense u  
     cs  = uCards u
+    m   = uMoney u
 
 -- | Function to change universe according
 --   to its rules by the interaction with the player

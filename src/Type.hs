@@ -103,5 +103,6 @@ data Universe = Universe
   , uScreen     :: Picture     -- ^ special screen to denote the game over
   , uOver       :: Bool        -- ^ denotes if the game is over
   , uTime       :: Float       -- ^ amount of time passed since start
+  , uMoney      :: Int
   }
 

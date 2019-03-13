@@ -14,10 +14,12 @@ handleCoords :: Coords -> Universe -> Universe
 handleCoords mouseCoords u = u 
                 { uDefense = newDefense
                 , uCards   = newCards
+                , uMoney   = newMoney
                 }
   where
     newCards   = handleCards mouseCoords (uCards u)
     newDefense = handlePlants mouseCoords u
+    newMoney   = handleMoney mouseCoords u
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
@@ -84,9 +86,8 @@ getCoords xy (x : xs) = if checkMouse xy x cellWidth cellHeight
 collectSun :: Coords -> [Plant] -> [Plant]
 collectSun mc ps = pss ++ map (removeSun mc) sfs
   where
-    sfs = filter (\p -> pType p == Sunflower) ps
-    pss = filter (\p -> pType p /= Sunflower) ps
-
+    (sfs, pss) = filterPlant ps
+    
 removeSun :: Coords -> Plant -> Plant
 removeSun mc p = remove ss
   where
@@ -94,6 +95,30 @@ removeSun mc p = remove ss
     remove (x : xs) = if checkMouse mc (prCoords x) plantSize plantSize
                         then p { pBullet = xs }
                         else remove xs
+    ss = pBullet p
+
+filterPlant :: [Plant] -> ([Plant], [Plant])
+filterPlant ps = (sfs, pss)
+  where
+    sfs = filter (\p -> pType p == Sunflower) ps
+    pss = filter (\p -> pType p /= Sunflower) ps
+
+handleMoney :: Coords -> Universe -> Int
+handleMoney mc u = uMoney u + addMoney
+  where
+    collection = map (isCollected mc) sfs
+    (sfs, _)   = filterPlant (uDefense u)
+    addMoney
+      | True `elem` collection = 50
+      | otherwise              = 0
+
+isCollected :: Coords -> Plant -> Bool
+isCollected mc p = collect ss
+  where
+    collect []       = False
+    collect (x : xs) = if checkMouse mc (prCoords x) plantSize plantSize
+                          then True
+                          else collect xs
     ss = pBullet p
 
 checkMouse :: Coords -> Coords -> Float -> Float -> Bool

@@ -52,6 +52,6 @@ drawCard card = Translate x y
     (x, y)     = cCoords card
 
 drawMoney :: Int -> Picture
-drawMoney m = Translate (-600) (200) pic
+drawMoney m = Translate (-658) (220) pic
   where
-    pic = scale 0.2 0.2 (text (show m))
+    pic = scale 0.15 0.15 (text (show m))

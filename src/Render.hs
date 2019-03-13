@@ -46,4 +46,4 @@ drawCard card = translate x y
   where
     drawLining = color cardLiningColor 
       (rectangleSolid (cardWidth + cardLiningThickness * 2) (cardHeight + cardLiningThickness * 2))
-    (x, y) = cardCoords card
+    (x, y) = cCoords card

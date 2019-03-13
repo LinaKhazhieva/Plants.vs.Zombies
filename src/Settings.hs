@@ -13,6 +13,18 @@ begginnerCoords = -450
 endingCoords :: Float
 endingCoords = 300
 
+bottomCoords :: Float
+bottomCoords = -280
+
+topCoords :: Float
+topCoords = 220
+
+cellWidth :: Float
+cellWidth = 84
+
+cellHeight :: Float
+cellHeight = 100
+
 boxSize :: Float
 boxSize = 30
 
@@ -58,6 +70,18 @@ deltaYProjectile = 15
 deltaXProjectile :: Float
 deltaXProjectile = 40
 
+cellCoords :: [Coords]
+cellCoords =
+  [ (-408, 170), (-408, 70), (-408, -30), (-408, -130), (-408, -225)
+  , (-325, 170), (-325, 70), (-325, -30), (-325, -130), (-325, -225)
+  , (-245, 170), (-245, 70), (-245, -30), (-245, -130), (-245, -225)
+  , (-158, 170), (-158, 70), (-158, -30), (-158, -130), (-158, -225)
+  , ( -80, 170), ( -80, 70), ( -80, -30), ( -80, -130), ( -80, -225)
+  , (  0, 170), (  0, 70), (  0, -30), (  0, -130), (  0, -225)
+  , (  80, 170), (  80, 70), (  80, -30), (  80, -130), (  80, -225)
+  , ( 155, 170), ( 155, 70), ( 155, -30), ( 155, -130), ( 155, -225)
+  , ( 240, 170), ( 240, 70), ( 240, -30), ( 240, -130), ( 240, -225) ]
+
 -- | Predefined wave of enemies
 sampleZombies :: [Zombie]
 sampleZombies = 
@@ -69,10 +93,10 @@ sampleZombies =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant PeasShooter (-400,  100) 0 [] 0
-  , Plant PeasShooter (-400,    0) 0 [] 0
-  , Plant PeasShooter (-400, -100) 0 [] 0
-  , Plant Sunflower   (-330, 100)  0 [] 4
+  [ Plant PeasShooter (-400,  70) 0 [] 0
+  , Plant PeasShooter (-400, -30) 0 [] 0
+  , Plant PeasShooter (-400, -130) 0 [] 0
+--  , Plant Sunflower   (-330, 100)  0 [] 4
   ]
  
 cards :: [Card]

@@ -28,8 +28,8 @@ drawUniverse u = field
 -- | Function to change universe according
 --   to its rules by the interaction with the player
 handleUniverse :: Event -> Universe -> Universe
-handleUniverse (EventKey (MouseButton LeftButton) Down _ mouseCoords) u = 
-  u { uCards = (updateCards mouseCoords (uCards u)) }
+handleUniverse (EventKey (MouseButton LeftButton)
+               Down _ mouseCoords) u = handleCoords mouseCoords u
 handleUniverse _  u = u
 
 -- | Function to change universe according

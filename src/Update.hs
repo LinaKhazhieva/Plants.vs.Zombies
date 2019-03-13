@@ -198,7 +198,7 @@ peaVision
   -> Bool -- ^ True if sees Flase otherwise
 peaVision (_, y) zombie = checkVision
   where
-    checkVision = y == zY - 50 && zX < endingCoords
+    checkVision = y == zY - 80 && zX < endingCoords
     (zX, zY)    = zCoords zombie   
 
 -- | Function to move projectiles of the plant, by the

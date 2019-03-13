@@ -41,7 +41,7 @@ data Card = Card
   { cardColor  :: Color     -- ^ Color of Card
   , isActive   :: Bool      -- ^ is Card currently chosen
   , plantType  :: PlantType -- ^ type of Plant to plant if Card is active
-  , cardCoords :: Coords    -- ^ Card coordinates
+  , cCoords :: Coords    -- ^ Card coordinates
   }
 
 -- | Data type to store different types of plant
@@ -87,6 +87,10 @@ pCardColor Sunflower   = yellow
 pFrequency :: PlantType -> Float
 pFrequency PeasShooter = 5
 pFrequency Sunflower   = 4
+
+pStarterTimer :: PlantType -> Float
+pStarterTimer PeasShooter = 0
+pStarterTimer Sunflower   = pFrequency Sunflower
 
 prPicture :: ProjectileType -> Picture
 prPicture Sun = sun

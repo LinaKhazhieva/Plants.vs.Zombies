@@ -38,14 +38,18 @@ zPicture Buckethead = bucketheadZombie
 
 -- | One particular card
 data Card = Card
-  { cardColor  :: Color     -- ^ Color of Card
-  , isActive   :: Bool      -- ^ is Card currently chosen
+  { isActive   :: Bool      -- ^ is Card currently chosen
   , plantType  :: PlantType -- ^ type of Plant to plant if Card is active
-  , cardCoords :: Coords    -- ^ Card coordinates
+  , cCoords :: Coords    -- ^ Card coordinates
   }
 
+cPicture :: PlantType -> Picture
+cPicture PeasShooter = peasshooterCard
+cPicture Sunflower   = sunflowerCard
+
 -- | Data type to store different types of plant
-data PlantType = PeasShooter
+data PlantType = PeasShooter | Sunflower
+  deriving (Eq)
 
 -- | Data type for Plants
 data Plant = Plant
@@ -56,52 +60,45 @@ data Plant = Plant
   , pSeconds  :: Float        -- ^ seconds that is left till the plant shoots
   }
 
+data ProjectileType = Sun | Pea
+  deriving (Eq)
+
 -- | Data type for projectile of the other plant
 data Projectile = Projectile
-  { prCoords :: Coords   -- ^ coordinates of projectile
+  { prType   :: ProjectileType
+  , prCoords :: Coords          -- ^ coordinates of projectile
   }
 
 -- | Accessor for the plant
 pHealth :: PlantType -> Int
-pHealth _p = 10
+pHealth _p = 1
 
 -- | Accessor for the plant strength
 pStrength :: PlantType -> Int 
-pStrength _p = 1
+pStrength PeasShooter = 1
+pStrength Sunflower   = 0
 
 -- | Accessor to render plant type
 pPicture :: PlantType -> Picture
-pPicture _p = plant
+pPicture PeasShooter = plant
+pPicture Sunflower   = sunflower
 
-pCardColor :: PlantType -> Color
-pCardColor PeasShooter = green
+pFrequency :: PlantType -> Float
+pFrequency PeasShooter = 5
+pFrequency Sunflower   = 4
 
--- | Data type for Sunflowers,
--- stored in additional type, because sunflowers
--- has different dynamics
--- TODO: change the dynamic of the Projectile and
--- connect sunflowers to plant
-data Sunflower = Sunflower
-  { sCoords   :: Coords -- ^ coordinates of Sunflower
-  , sDamage   :: Int    -- ^ health of the Sunflower 
-  , sSun      :: [Sun]  -- ^ sun of the Sunflower
-  , sSeconds  :: Float  -- ^ seconds that is left till the plant shoots
-  }
+pStarterTimer :: PlantType -> Float
+pStarterTimer PeasShooter = 0
+pStarterTimer Sunflower   = pFrequency Sunflower
 
--- | Data type for projectile of the sunflower
-data Sun = Sun 
-  { sunCoords :: Coords -- ^ coordinates of sun 
-  }
-
--- | Accessor for the sunflower
-sHealth :: Sunflower -> Int 
-sHealth _s = 10 
+prPicture :: ProjectileType -> Picture
+prPicture Sun = sun
+prPicture Pea = projectile
 
 -- | Data type for whole Universe
 data Universe = Universe
   { uEnemies    :: [Zombie]    -- ^ predefined wave
   , uDefense    :: [Plant]     -- ^ list of plants that player put
-  , uSunflowers :: [Sunflower] -- ^ list of sunflowers that player put
   , uCards      :: [Card]      -- ^ cards of plants to plant
   , uScreen     :: Picture     -- ^ special screen to denote the game over
   , uOver       :: Bool        -- ^ denotes if the game is over

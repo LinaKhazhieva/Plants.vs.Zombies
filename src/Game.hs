@@ -13,22 +13,23 @@ import Handle
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = field
-              <> drawObject drawZombie zs
-              <> drawObject drawSunflower sfs
               <> drawObject drawPlant  ps
+              <> drawProjectiles Sun prs
+              <> drawProjectiles Pea prs
+              <> drawObject drawZombie zs
               <> drawObject drawCard cs 
               <> uScreen u
   where
+    prs = concat (map pBullet ps)
     zs  = uEnemies u
-    ps  = uDefense u
-    sfs = uSunflowers u
+    ps  = uDefense u  
     cs  = uCards u
 
 -- | Function to change universe according
 --   to its rules by the interaction with the player
 handleUniverse :: Event -> Universe -> Universe
-handleUniverse (EventKey (MouseButton LeftButton) Down _ mouseCoords) u = 
-  u { uCards = (updateCards mouseCoords (uCards u)) }
+handleUniverse (EventKey (MouseButton LeftButton)
+               Down _ mouseCoords) u = handleCoords mouseCoords u
 handleUniverse _  u = u
 
 -- | Function to change universe according
@@ -43,13 +44,11 @@ updateUniverse dt u
   | otherwise = u
         { uEnemies = newEnemies
         , uDefense = newDefense
-        , uSunflowers =  newSunflower
         , uTime    = newTime
         }
   where
     newEnemies = updateZombies dt u 
-    newDefense = updatePlants dt u 
-    newSunflower = updateSunflowers dt u 
+    newDefense = updatePlants dt u
     newTime = (uTime u) + dt
 
 perform :: IO()

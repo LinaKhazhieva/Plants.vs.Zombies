@@ -38,11 +38,14 @@ zPicture Buckethead = bucketheadZombie
 
 -- | One particular card
 data Card = Card
-  { cardColor  :: Color     -- ^ Color of Card
-  , isActive   :: Bool      -- ^ is Card currently chosen
+  { isActive   :: Bool      -- ^ is Card currently chosen
   , plantType  :: PlantType -- ^ type of Plant to plant if Card is active
   , cCoords :: Coords    -- ^ Card coordinates
   }
+
+cPicture :: PlantType -> Picture
+cPicture PeasShooter = peasshooterCard
+cPicture Sunflower   = sunflowerCard
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower
@@ -68,7 +71,7 @@ data Projectile = Projectile
 
 -- | Accessor for the plant
 pHealth :: PlantType -> Int
-pHealth _p = 10
+pHealth _p = 1
 
 -- | Accessor for the plant strength
 pStrength :: PlantType -> Int 
@@ -79,10 +82,6 @@ pStrength Sunflower   = 0
 pPicture :: PlantType -> Picture
 pPicture PeasShooter = plant
 pPicture Sunflower   = sunflower
-
-pCardColor :: PlantType -> Color
-pCardColor PeasShooter = green
-pCardColor Sunflower   = yellow
 
 pFrequency :: PlantType -> Float
 pFrequency PeasShooter = 5

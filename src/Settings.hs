@@ -4,7 +4,6 @@
 module Settings where
 
 import Type
-import Structure.Object
 import Graphics.Gloss
 
 begginnerCoords :: Float
@@ -20,7 +19,7 @@ topCoords :: Float
 topCoords = 220
 
 cellWidth :: Float
-cellWidth = 84
+cellWidth = 50
 
 cellHeight :: Float
 cellHeight = 100
@@ -32,7 +31,7 @@ cardWidth :: Float
 cardWidth = 50
 
 cardHeight :: Float
-cardHeight = 45
+cardHeight = 70
 
 cardLiningThickness :: Float
 cardLiningThickness = 3
@@ -41,7 +40,7 @@ cardLiningColor :: Color
 cardLiningColor = black
 
 cardsDistance :: Float
-cardsDistance = 20
+cardsDistance = 15
 
 cardsMarginX :: Float
 cardsMarginX = 50
@@ -55,11 +54,8 @@ zombieWidth = 115
 zombieHeight :: Float
 zombieHeight = 200
 
-plantWidth :: Float
-plantWidth = 80
-
-plantHeight :: Float
-plantHeight = 80
+plantSize :: Float
+plantSize = 80
 
 peasSize :: Float
 peasSize = 20
@@ -77,7 +73,7 @@ cellCoords =
   , (-245, 170), (-245, 70), (-245, -30), (-245, -130), (-245, -225)
   , (-158, 170), (-158, 70), (-158, -30), (-158, -130), (-158, -225)
   , ( -80, 170), ( -80, 70), ( -80, -30), ( -80, -130), ( -80, -225)
-  , (  0, 170), (  0, 70), (  0, -30), (  0, -130), (  0, -225)
+  , (   0, 170), (   0, 70), (   0, -30), (   0, -130), (   0, -225)
   , (  80, 170), (  80, 70), (  80, -30), (  80, -130), (  80, -225)
   , ( 155, 170), ( 155, 70), ( 155, -30), ( 155, -130), ( 155, -225)
   , ( 240, 170), ( 240, 70), ( 240, -30), ( 240, -130), ( 240, -225) ]
@@ -93,23 +89,22 @@ sampleZombies =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant PeasShooter (-400,  70) 0 [] 0
-  , Plant PeasShooter (-400, -30) 0 [] 0
-  , Plant PeasShooter (-400, -130) 0 [] 0
+  [ Plant PeasShooter (-408,  70) 0 [] 0
+  , Plant PeasShooter (-408, -30) 0 [] 0
+  , Plant PeasShooter (-408, -130) 0 [] 0
 --  , Plant Sunflower   (-330, 100)  0 [] 4
   ]
  
 cards :: [Card]
-cards = initCards [PeasShooter, Sunflower] 
-  (cardsMarginX - fromIntegral screenWidth / 2 + cardWidth / 2,
-  fromIntegral screenHeight / 2 - cardsMarginY - cardHeight / 2)
+cards = initCards [PeasShooter, Sunflower] (-570,  256.5)
 
 initCards :: 
   [PlantType]
   -> Coords -- ^ Coordinatates of the first card
   -> [Card]
 initCards [] _ = []
-initCards (p:ps) (x, y) = [Card (pCardColor p) False p (x, y)] ++ initCards ps (x + cardWidth + cardsDistance, y)
+initCards (p:ps) (x, y) = [Card False p (x, y)]
+                       ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 -- | Starter universe
 initUniverse :: Universe

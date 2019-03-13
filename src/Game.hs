@@ -13,10 +13,10 @@ import Handle
 -- | Function to render universe
 drawUniverse :: Universe -> Picture
 drawUniverse u = field
-              <> drawObject drawZombie zs
               <> drawObject drawPlant  ps
               <> drawProjectiles Sun prs
               <> drawProjectiles Pea prs
+              <> drawObject drawZombie zs
               <> drawObject drawCard cs 
               <> uScreen u
   where

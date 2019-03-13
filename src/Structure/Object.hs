@@ -45,11 +45,24 @@ sunflower = pic
   where
     pic = loadPicture "images/sunflower.bmp"
 
-screen :: Display
-screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)
+cardBlock :: Picture
+cardBlock = scale 0.5 0.5 pic
+  where
+    pic = loadPicture "images/cardblock.bmp"
+
+peasshooterCard :: Picture
+peasshooterCard = scale 0.52 0.52 pic
+  where
+    pic = loadPicture "images/peasshootercard.bmp"
+
+sunflowerCard :: Picture
+sunflowerCard = scale 0.52 0.52 pic
+  where
+    pic = loadPicture "images/sunflowercard.bmp"
 
 field :: Picture
-field = pic
+field = pic 
+     <> Translate (-461.25) 256.5 cardBlock
 --     <> line [(-408, -300), (-408, 300)]
 --     <> line [(-325, -300), (-325, 300)]
 --     <> line [(-245, -300), (-245, 300)]
@@ -72,3 +85,6 @@ lost = Translate (-200) 0 (scale 0.5 0.5 (text "You lost"))
 
 win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
+
+screen :: Display
+screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)

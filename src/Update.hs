@@ -18,7 +18,7 @@ attack f (x : xs) b = attack f xs (f x b)
 
 collisionPlantZombie :: Coords -> Coords -> Bool
 collisionPlantZombie z p = checkCollision zombieWidth zombieHeight
-                           plantWidth plantHeight z p
+                           plantSize plantSize z p
 
 collisionPeasZombie :: Coords -> Coords -> Bool
 collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize

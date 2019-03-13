@@ -40,10 +40,13 @@ drawProjectiles t prs = drawObject drawProjectile newPrs
     newPrs = filter (\pr -> (prType pr) == t) prs
 
 drawCard :: Card -> Picture
-drawCard card = translate x y
-                (pictures [if (isActive card) then drawLining else blank, 
-                color (cardColor card) (rectangleSolid cardWidth cardHeight)])
+drawCard card = Translate x y
+                (border <> cPicture (plantType card))
   where
-    drawLining = color cardLiningColor 
-      (rectangleSolid (cardWidth + cardLiningThickness * 2) (cardHeight + cardLiningThickness * 2))
-    (x, y) = cCoords card
+    border     = if (isActive card)
+                 then drawLining
+                 else blank
+    drawLining = color cardLiningColor (rectangleSolid 
+                 (cardWidth + cardLiningThickness * 2) 
+                 (cardHeight + cardLiningThickness * 2))
+    (x, y)     = cCoords card

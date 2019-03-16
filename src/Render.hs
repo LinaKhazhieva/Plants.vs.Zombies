@@ -39,10 +39,13 @@ drawProjectiles t prs = drawObject drawProjectile newPrs
   where
     newPrs = filter (\pr -> (prType pr) == t) prs
 
-drawCard :: Card -> Picture
-drawCard card = Translate x y
-                (border <> cPicture (plantType card))
+drawCard :: Int -> Card -> Picture
+drawCard m card
+  | m < cMoney (plantType card) = pic <> color transparentBlack rctngl
+  | otherwise                   = pic 
   where
+    rctngl     = Translate x y (rectangleSolid cardWidth cardHeight)
+    pic        = Translate x y (border <> cPicture (plantType card))
     border     = if (isActive card)
                  then drawLining
                  else blank

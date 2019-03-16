@@ -66,6 +66,9 @@ deltaYProjectile = 15
 deltaXProjectile :: Float
 deltaXProjectile = 40
 
+transparentBlack :: Color
+transparentBlack = makeColor 0 0 0 0.57 
+
 cellCoords :: [Coords]
 cellCoords =
   [ (-408, 170), (-408, 70), (-408, -30), (-408, -130), (-408, -225)

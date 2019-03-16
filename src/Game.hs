@@ -17,7 +17,7 @@ drawUniverse u = field
               <> drawProjectiles Sun prs
               <> drawProjectiles Pea prs
               <> drawObject drawZombie zs
-              <> drawObject drawCard cs
+              <> drawObject (drawCard m) cs
               <> drawMoney m 
               <> uScreen u
   where

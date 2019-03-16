@@ -17,57 +17,68 @@ handleCoords mouseCoords u = u
                 , uMoney   = newMoney
                 }
   where
-    newCards   = handleCards mouseCoords (uCards u)
-    newDefense = handlePlants mouseCoords u
-    newMoney   = handleMoney mouseCoords u
+    newCards   = handleCards mouseCoords u (uCards u)
+    (newDefense, newMoney) = handlePlants mouseCoords u
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
 --   deactivate the active card
 -- * if player clicked on the player invert
 --   its property of active
-handleCards :: Coords -> [Card] -> [Card]
-handleCards mXY _cards
+handleCards :: Coords -> Universe -> [Card] -> [Card]
+handleCards mXY u _cards
   | any isActive _cards = cards
-  | otherwise           = map (\c -> 
-                           if checkMouse mXY (cCoords c) cardWidth cardHeight
-                           then invertCardActive c
-                           else c) _cards
+  | otherwise           = map activate  _cards
+  where
+    activate c = if mouseClickedCard && m >= cMoney (plantType c)
+                    then invertCardActive c
+                    else c
+      where
+        mouseClickedCard = checkMouse mXY (cCoords c) cardWidth cardHeight
+        m = uMoney u
 
-handlePlants :: Coords -> Universe -> [Plant]
-handlePlants mc u = handle ps
+-- | Function to handle plants on mouse click
+--
+-- * perform adding plants to the game border
+--
+-- * perform collecting suns
+handlePlants :: Coords -> Universe -> ([Plant], Int)
+handlePlants mc u = handle (ps, money)
   where
     handle = addPlant mc u
-           . collectSun mc
+           . collectSun mc u
     ps     = uDefense u
+    money  = uMoney u
 
--- | Function to plant the card. First checks if
---   some card is chosen, then checks if the coords
---   are corresponding to the right coordinates
---   of the cell
-addPlant :: Coords -> Universe -> [Plant] -> [Plant]
-addPlant mc u = putPlant (active, coords)
+-- | Function to plant the card.
+--
+--   Find possible active card of plant or nothing
+--   Find possible cell coordinates or nothing 
+addPlant :: Coords -> Universe -> ([Plant], Int) -> ([Plant], Int)
+addPlant mc u (ps, money) = putPlant (active, coords) ps money
   where
     active = listToMaybe (filter isActive cs)
     coords = getCoords mc cellCoords
-    cs = uCards u
+    cs     = uCards u
 
 -- | Function to plant the card.
 -- * if none card is active -> return same plants
 -- * if coords are wrong    -> return same plants
 -- * else                   -> create new plant on coords
 --                             and with type stated by card
-putPlant :: (Maybe Card, Maybe Coords) -> [Plant] -> [Plant]
-putPlant (active, coords) ps = 
+putPlant :: (Maybe Card, Maybe Coords) -> [Plant] -> Int -> ([Plant], Int)
+putPlant (active, coords) ps m = 
   case (active, coords) of
-    (Nothing, _) -> ps
-    (_, Nothing) -> ps
-    (Just card, Just xy) -> if True `elem` (collisions xy)
-                               then ps
-                               else newP card xy : ps
+    (Nothing, _) -> (ps, m)
+    (_, Nothing) -> (ps, m)
+    (Just card, Just xy) -> if any (collisions xy) pXY || canBuy card
+                               then (ps, m)
+                               else (newP card xy : ps, m - sub card)
   where
-    collisions xy = map (checkCollision size size size size xy) pXY 
+    collisions xy = checkCollision size size size size xy
+    canBuy card   = cMoney (plantType card) > m
     size          = plantSize
+    sub card      = cMoney (plantType card)
     pXY           = map pCoords ps
     newP c xy     = Plant pt xy 0 [] (pStarterTimer pt)
       where
@@ -83,42 +94,38 @@ getCoords xy (x : xs) = if checkMouse xy x cellWidth cellHeight
                         then Just x
                         else getCoords xy xs
 
-collectSun :: Coords -> [Plant] -> [Plant]
-collectSun mc ps = pss ++ map (removeSun mc) sfs
+collectSun :: Coords -> Universe -> ([Plant], Int) -> ([Plant], Int)
+collectSun mc u (ps, m) = if active
+                             then (ps, m)
+                             else (pss ++ remove, m + addMoney)
   where
+    active = any isActive cs
+    remove = map (removeSun mc) sfs
+    collection = map (isCollected mc) sfs
     (sfs, pss) = filterPlant ps
+    cs = uCards u
+    addMoney
+      | True `elem` collection = 25
+      | otherwise              = 0
     
 removeSun :: Coords -> Plant -> Plant
-removeSun mc p = remove ss
+removeSun mc p = p { pBullet = newBullet }
+  
   where
-    remove []       = p
-    remove (x : xs) = if checkMouse mc (prCoords x) plantSize plantSize
-                        then p { pBullet = xs }
-                        else remove xs
+    newBullet = filter (\x -> not (checkMouse mc 
+                (prCoords x) plantSize plantSize)) ss
     ss = pBullet p
 
 filterPlant :: [Plant] -> ([Plant], [Plant])
 filterPlant ps = (sfs, pss)
   where
     sfs = filter (\p -> pType p == Sunflower) ps
-    pss = filter (\p -> pType p /= Sunflower) ps
-
-handleMoney :: Coords -> Universe -> Int
-handleMoney mc u = uMoney u + addMoney
-  where
-    collection = map (isCollected mc) sfs
-    (sfs, _)   = filterPlant (uDefense u)
-    addMoney
-      | True `elem` collection = 50
-      | otherwise              = 0
+    pss = filter (\p -> pType p /= Sunflower) ps    
 
 isCollected :: Coords -> Plant -> Bool
-isCollected mc p = collect ss
+isCollected mc p = collected
   where
-    collect []       = False
-    collect (x : xs) = if checkMouse mc (prCoords x) plantSize plantSize
-                          then True
-                          else collect xs
+    collected = any (\x -> checkMouse mc (prCoords x) plantSize plantSize) ss
     ss = pBullet p
 
 checkMouse :: Coords -> Coords -> Float -> Float -> Bool

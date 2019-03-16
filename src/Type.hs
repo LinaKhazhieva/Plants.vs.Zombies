@@ -47,6 +47,10 @@ cPicture :: PlantType -> Picture
 cPicture PeasShooter = peasshooterCard
 cPicture Sunflower   = sunflowerCard
 
+cMoney :: PlantType -> Int
+cMoney PeasShooter = 100
+cMoney Sunflower   = 50
+
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower
   deriving (Eq)

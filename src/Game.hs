@@ -14,18 +14,19 @@ import Handle
 drawUniverse :: Universe -> Picture
 drawUniverse u = field
               <> drawObject drawPlant  ps
-              <> drawProjectiles Sun prs
+              <> drawProjectiles Sun (prs ++ ss)
               <> drawProjectiles Pea prs
               <> drawObject drawZombie zs
               <> drawObject (drawCard m) cs
               <> drawMoney m 
               <> uScreen u
   where
-    prs = concat (map pBullet ps)
-    zs  = uEnemies u
-    ps  = uDefense u  
-    cs  = uCards u
-    m   = uMoney u
+    prs      = concat (map pBullet ps)
+    zs       = uEnemies u
+    ps       = uDefense u  
+    cs       = uCards u
+    m        = uMoney u
+    (ss, _)  = uSuns u
 
 -- | Function to change universe according
 --   to its rules by the interaction with the player
@@ -46,12 +47,14 @@ updateUniverse dt u
   | otherwise = u
         { uEnemies = newEnemies
         , uDefense = newDefense
+        , uSuns    = newSuns
         , uTime    = newTime
         }
   where
     newEnemies = updateZombies dt u 
     newDefense = updatePlants dt u
-    newTime = (uTime u) + dt
+    newSuns    = updateSuns dt u
+    newTime    = (uTime u) + dt
 
 perform :: IO()
 perform = play

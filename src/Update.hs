@@ -248,3 +248,10 @@ sendSun dt p
     (x, y)  = pCoords p 
     newSun  = Projectile Sun (x + 70, y - 25)
     oldSuns = pBullet p
+
+updateSuns :: Float -> Universe -> ([Projectile], Float)
+updateSuns dt u
+  | seconds <= 0 = (send, uFrequency u)
+  | otherwise    = (ss, seconds)
+  where
+    seconds = t - dt

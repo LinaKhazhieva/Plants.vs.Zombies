@@ -101,12 +101,15 @@ prPicture Pea = projectile
 
 -- | Data type for whole Universe
 data Universe = Universe
-  { uEnemies    :: [Zombie]    -- ^ predefined wave
-  , uDefense    :: [Plant]     -- ^ list of plants that player put
-  , uCards      :: [Card]      -- ^ cards of plants to plant
-  , uScreen     :: Picture     -- ^ special screen to denote the game over
-  , uOver       :: Bool        -- ^ denotes if the game is over
-  , uTime       :: Float       -- ^ amount of time passed since start
+  { uEnemies    :: [Zombie]              -- ^ predefined wave
+  , uDefense    :: [Plant]               -- ^ list of plants that player put
+  , uCards      :: [Card]                -- ^ cards of plants to plant
+  , uSuns       :: ([Projectile], Float) -- ^ suns falling from the sky,
+                                         -- with time left to create the sun
+  , uScreen     :: Picture               -- ^ special screen to denote
+                                         -- the game over
+  , uOver       :: Bool                  -- ^ denotes if the game is over
+  , uTime       :: Float                 -- ^ amount of time passed since start
   , uMoney      :: Int
   }
 

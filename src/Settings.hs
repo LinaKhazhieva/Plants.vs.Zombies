@@ -66,6 +66,9 @@ deltaYProjectile = 15
 deltaXProjectile :: Float
 deltaXProjectile = 40
 
+uFrequency :: Float
+uFrequency = 6
+
 transparentBlack :: Color
 transparentBlack = makeColor 0 0 0 0.57 
 
@@ -115,6 +118,7 @@ initUniverse = Universe
                sampleZombies
                samplePlants
                cards
+               ([Projectile Sun (-200, -28)], 4)
                blank
                False
                0

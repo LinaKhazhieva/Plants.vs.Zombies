@@ -17,7 +17,7 @@ handleCoords mouseCoords u = u
                 , uMoney   = newMoney
                 }
   where
-    newCards   = handleCards mouseCoords u (uCards u)
+    newCards               = handleCards mouseCoords u (uCards u)
     (newDefense, newMoney) = handlePlants mouseCoords u
 
 -- | Function to handle picking plant card
@@ -99,8 +99,8 @@ collectSun mc u (ps, m) = if active
                              then (ps, m)
                              else (pss ++ remove, m + addMoney)
   where
-    active = any isActive cs
-    remove = map (removeSun mc) sfs
+    active     = any isActive cs
+    remove     = map (removeSun mc) sfs
     collection = map (isCollected mc) sfs
     (sfs, pss) = filterPlant ps
     cs = uCards u

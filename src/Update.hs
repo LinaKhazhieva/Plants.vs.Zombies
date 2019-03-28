@@ -251,7 +251,10 @@ sendSun dt p
 
 updateSuns :: Float -> Universe -> ([Projectile], Float)
 updateSuns dt u
-  | seconds <= 0 = (send, uFrequency u)
+  | seconds <= 0 = (send, uFrequency)
   | otherwise    = (ss, seconds)
   where
     seconds = t - dt
+    send    = newSun : ss
+    newSun  = Projectile Sun (90, -25) 
+    (ss, t) = uSuns u 

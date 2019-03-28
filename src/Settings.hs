@@ -118,7 +118,7 @@ initUniverse = Universe
                sampleZombies
                samplePlants
                cards
-               ([Projectile Sun (-200, -28)], 4)
+               ([], uFrequency)
                blank
                False
                0

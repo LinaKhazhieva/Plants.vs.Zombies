@@ -131,7 +131,9 @@ field = pic
     pic = unsafePerformIO $ loadBMP "images/Background.bmp"
 
 lost :: Picture
-lost = Translate (-200) 0 (scale 0.5 0.5 (text "You lost"))
+lost = pic
+  where 
+    pic = loadPicture "images/lose.bmp" 
 
 win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))

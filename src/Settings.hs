@@ -95,9 +95,9 @@ sampleZombies =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [ Plant PeasShooter (-408,  70) 0 [] 0
-  , Plant PeasShooter (-408, -30) 0 [] 0
-  , Plant PeasShooter (-408, -130) 0 [] 0
+  [ -- Plant PeasShooter (-408,  70) 0 [] 0
+  -- , Plant PeasShooter (-408, -30) 0 [] 0
+ -- , Plant PeasShooter (-408, -130) 0 [] 0
 --  , Plant Sunflower   (-330, 100)  0 [] 4
   ]
  

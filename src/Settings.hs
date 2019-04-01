@@ -66,6 +66,12 @@ deltaYProjectile = 15
 deltaXProjectile :: Float
 deltaXProjectile = 40
 
+uFrequency :: Float
+uFrequency = 6
+
+transparentBlack :: Color
+transparentBlack = makeColor 0 0 0 0.57 
+
 cellCoords :: [Coords]
 cellCoords =
   [ (-408, 170), (-408, 70), (-408, -30), (-408, -130), (-408, -225)
@@ -112,6 +118,8 @@ initUniverse = Universe
                sampleZombies
                samplePlants
                cards
+               ([], uFrequency)
                blank
                False
                0
+               50

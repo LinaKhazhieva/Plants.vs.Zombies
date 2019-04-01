@@ -39,10 +39,13 @@ drawProjectiles t prs = drawObject drawProjectile newPrs
   where
     newPrs = filter (\pr -> (prType pr) == t) prs
 
-drawCard :: Card -> Picture
-drawCard card = Translate x y
-                (border <> cPicture (plantType card))
+drawCard :: Int -> Card -> Picture
+drawCard m card
+  | m < cMoney (plantType card) = pic <> color transparentBlack rctngl
+  | otherwise                   = pic 
   where
+    rctngl     = Translate x y (rectangleSolid cardWidth cardHeight)
+    pic        = Translate x y (border <> cPicture (plantType card))
     border     = if (isActive card)
                  then drawLining
                  else blank
@@ -50,3 +53,22 @@ drawCard card = Translate x y
                  (cardWidth + cardLiningThickness * 2) 
                  (cardHeight + cardLiningThickness * 2))
     (x, y)     = cCoords card
+
+drawMoney :: Int -> Picture
+drawMoney m = Translate (-638) (227) pic
+  where
+    pic = renderMoney m
+
+digits :: Int -> [Int]
+digits n = map (\x -> read [x] :: Int) (show n)
+
+renderMoney :: Int -> Picture
+renderMoney m = moveDigits (map digitToPic (digits m))
+
+moveDigits :: [Picture] -> Picture
+moveDigits []       = blank
+moveDigits (d : ds) = Translate x 0 d <> moveDigits ds
+  where
+    x = -12 * fromIntegral (length ds)
+    
+    

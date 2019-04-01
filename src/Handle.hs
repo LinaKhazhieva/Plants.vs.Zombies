@@ -6,6 +6,7 @@ module Handle where
 import Type
 import Settings
 import Data.Maybe
+import Data.List
 import Utils
 
 -- | Function to change the universe, based on the
@@ -98,6 +99,13 @@ getCoords xy (x : xs) = if checkMouse xy x cellWidth cellHeight
                         then Just x
                         else getCoords xy xs
 
+-- | Function to collect suns, which were fallen from the
+--   sunflowers. First, checks if any card is active, 
+--   cause cannot plant/collect sun at the same time.
+--   Takes only sunflowers from plants and checks, if mouse
+--   coordinate intersects with one of the sun in sunflower
+--   If true, deletes the sun and adds money, else returns 
+--   the same list of plant and same amount of money
 collectSun :: Coords -> Universe -> ([Plant], Int) -> ([Plant], Int)
 collectSun mc u (ps, m) = if active
                              then (ps, m)
@@ -111,24 +119,51 @@ collectSun mc u (ps, m) = if active
     addMoney
       | True `elem` collection = 25
       | otherwise              = 0
-    
+
+-- | Function to remove sun
+--   Finds index of the first sun, which was clicked (as
+--   there maybe several suns on the same coordinates);
+--   splits list by the index, where first list will
+--   contain first clicked sun. Then filters the first list
+--   by removing this sun and concatenates with the rest of
+--   the suns.
+--   If there's no sun, return the same list
 removeSun :: Coords -> [Projectile] -> [Projectile]
 removeSun mc ss = newBullet
   where
-    newBullet = filter (\x -> not (checkMouse mc 
-                (prCoords x) 88.5 88.5)) ss
+    toDelete  = findIndex (\x -> checkMouse mc (prCoords x) 88.5 88.5) ss
+    newBullet = 
+      case toDelete of
+        Just index -> some index
+        Nothing    -> ss
+      where
+        some i        = filter predicate (fst (splitSuns i)) 
+                     ++ snd (splitSuns i)
+        splitSuns i   = splitAt (i + 1) ss
+        predicate sun = not (checkMouse mc (prCoords sun) 88.5 88.5)
 
+-- | Function to divide list of plants by the plant types.
+--   Creates two list: sunflowers, other type of plants
 filterPlant :: [Plant] -> ([Plant], [Plant])
 filterPlant ps = (sfs, pss)
   where
     sfs = filter (\p -> pType p == Sunflower) ps
     pss = filter (\p -> pType p /= Sunflower) ps    
 
+-- | Function to see, if the mouse clicked on suns coordinate
+--   if at least one coordinate satisfy the predicate,
+--   return True
 isCollected :: Coords -> [Projectile] -> Bool
 isCollected mc ss = collected
   where
     collected = any (\x -> checkMouse mc (prCoords x) 88.5 88.5) ss
 
+-- | Function to handle universe suns,
+--   First, checks if any card is active, 
+--   cause cannot plant/collect sun at the same time.
+--   if mouse coordinate intersects with one of the sun
+--   If true, deletes the sun and adds money, else returns 
+--   the same list of projectiles and same amount of money
 handleSuns :: Coords -> Universe -> Int -> (([Projectile], Float), Int)
 handleSuns mc u m = if active
                       then ((ss, t), m)

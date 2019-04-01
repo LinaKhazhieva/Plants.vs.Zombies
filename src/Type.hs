@@ -99,6 +99,19 @@ prPicture :: ProjectileType -> Picture
 prPicture Sun = sun
 prPicture Pea = projectile
 
+digitToPic :: Int -> Picture
+digitToPic 0 = zero
+digitToPic 1 = one
+digitToPic 2 = two
+digitToPic 3 = three
+digitToPic 4 = four
+digitToPic 5 = five
+digitToPic 6 = six
+digitToPic 7 = seven
+digitToPic 8 = eight
+digitToPic 9 = nine
+digitToPic _ = blank
+
 -- | Data type for whole Universe
 data Universe = Universe
   { uEnemies    :: [Zombie]              -- ^ predefined wave

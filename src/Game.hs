@@ -47,6 +47,7 @@ updateUniverse dt u
   | otherwise = u
         { uEnemies = newEnemies
         , uDefense = newDefense
+        , uCards   = newCards
         , uSuns    = newSuns
         , uTime    = newTime
         }
@@ -54,6 +55,7 @@ updateUniverse dt u
     newEnemies = updateZombies dt u 
     newDefense = updatePlants dt u
     newSuns    = updateSuns dt u
+    newCards   = updateCards dt u
     newTime    = (uTime u) + dt
 
 perform :: IO()

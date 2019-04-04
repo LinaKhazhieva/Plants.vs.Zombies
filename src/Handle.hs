@@ -19,11 +19,11 @@ handleCoords mouseCoords u = u
                 , uMoney   = updMoney
                 }
   where
-    newCards               = handleCards mouseCoords u (uCards u)
-    (newDefense, newMoney) = handlePlants mouseCoords u
-    (newSuns, updMoney)    = if newMoney == uMoney u
-                                then handleSuns mouseCoords u newMoney
-                                else (uSuns u, newMoney) 
+    (newDefense, updCs, newM) = handlePlants mouseCoords u
+    newCards                  = handleCards mouseCoords u updCs
+    (newSuns, updMoney)       = if newM == uMoney u
+                                  then handleSuns mouseCoords u newM
+                                  else (uSuns u, newM) 
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
@@ -31,14 +31,18 @@ handleCoords mouseCoords u = u
 -- * if player clicked on the player invert
 --   its property of active
 handleCards :: Coords -> Universe -> [Card] -> [Card]
-handleCards mXY u _cards
-  | any isActive _cards = cards
-  | otherwise           = map activate  _cards
+handleCards mXY u cs
+  | any isActive cs = map deactivate cs
+  | otherwise       = map activate cs
   where
-    activate c = if mouseClickedCard && m >= cMoney (plantType c)
+    deactivate c = if isActive c
+                     then invertCardActive c
+                     else c
+    activate c = if cond
                     then invertCardActive c
                     else c
       where
+        cond = mouseClickedCard && m >= cMoney (plantType c) && cTime c == 0
         mouseClickedCard = checkMouse mXY (cCoords c) cardWidth cardHeight
         m = uMoney u
 
@@ -47,7 +51,7 @@ handleCards mXY u _cards
 -- * perform adding plants to the game border
 --
 -- * perform collecting suns
-handlePlants :: Coords -> Universe -> ([Plant], Int)
+handlePlants :: Coords -> Universe -> ([Plant], [Card], Int)
 handlePlants mc u = handle (ps, money)
   where
     handle = addPlant mc u
@@ -59,33 +63,46 @@ handlePlants mc u = handle (ps, money)
 --
 --   Find possible active card of plant or nothing
 --   Find possible cell coordinates or nothing 
-addPlant :: Coords -> Universe -> ([Plant], Int) -> ([Plant], Int)
-addPlant mc u (ps, money) = putPlant (active, coords) ps money
+addPlant
+  :: Coords
+  -> Universe
+  -> ([Plant], Int)
+  -> ([Plant], [Card], Int)
+addPlant mc u (ps, money) = (newPs, newC, m) 
   where
-    active = listToMaybe (filter isActive cs)
-    coords = getCoords mc cellCoords
-    cs     = uCards u
+    (newPs, c, m) = putPlant (active, coords) ps money
+    active        = listToMaybe (filter isActive cs)
+    coords        = getCoords mc cellCoords
+    cs            = uCards u
+    newC          =
+      case c of
+        Nothing    -> cs
+        Just card  -> card : filter (\x -> not (isActive x)) cs
 
 -- | Function to plant the card.
 -- * if none card is active -> return same plants
 -- * if coords are wrong    -> return same plants
 -- * else                   -> create new plant on coords
 --                             and with type stated by card
-putPlant :: (Maybe Card, Maybe Coords) -> [Plant] -> Int -> ([Plant], Int)
+putPlant
+  :: (Maybe Card, Maybe Coords)
+  -> [Plant]
+  -> Int
+  -> ([Plant], Maybe Card, Int)
 putPlant (active, coords) ps m = 
   case (active, coords) of
-    (Nothing, _) -> (ps, m)
-    (_, Nothing) -> (ps, m)
     (Just card, Just xy) -> if any (collisions xy) pXY || canBuy card
-                               then (ps, m)
-                               else (newP card xy : ps, m - sub card)
+                               then (ps, Nothing, m)
+                               else (newP card xy, newC card, sub card)
+    _                    -> (ps, Nothing, m)
   where
     collisions xy = checkCollision size size size size xy
     canBuy card   = cMoney (plantType card) > m
     size          = plantSize
-    sub card      = cMoney (plantType card)
+    sub card      = m - cMoney (plantType card)
     pXY           = map pCoords ps
-    newP c xy     = Plant pt xy 0 [] (pStarterTimer pt)
+    newC c        = Just (c { cTime = cFrequency (plantType c) })
+    newP c xy     = Plant pt xy 0 [] (pStarterTimer pt) : ps
       where
         pt = plantType c
 

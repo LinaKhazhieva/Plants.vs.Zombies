@@ -40,7 +40,8 @@ zPicture Buckethead = bucketheadZombie
 data Card = Card
   { isActive   :: Bool      -- ^ is Card currently chosen
   , plantType  :: PlantType -- ^ type of Plant to plant if Card is active
-  , cCoords :: Coords    -- ^ Card coordinates
+  , cCoords    :: Coords    -- ^ Card coordinates
+  , cTime      :: Float
   }
 
 cPicture :: PlantType -> Picture
@@ -50,6 +51,10 @@ cPicture Sunflower   = sunflowerCard
 cMoney :: PlantType -> Int
 cMoney PeasShooter = 100
 cMoney Sunflower   = 50
+
+cFrequency :: PlantType -> Float
+cFrequency PeasShooter = 5
+cFrequency Sunflower   = 3
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower

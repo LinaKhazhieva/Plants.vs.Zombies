@@ -257,4 +257,19 @@ updateSuns dt u
     seconds = t - dt
     send    = newSun : ss
     newSun  = Projectile Sun (90, -25) 
-    (ss, t) = uSuns u 
+    (ss, t) = uSuns u
+
+updateCards :: Float -> Universe -> [Card]
+updateCards dt u = update
+  where
+    update = map (updateCard dt) cs
+    cs     = uCards u
+
+updateCard :: Float -> Card -> Card
+updateCard dt c
+  | seconds <= 0 = c
+         { cTime = 0}
+  | otherwise    = c
+         { cTime = seconds }
+  where
+    seconds = cTime c - dt

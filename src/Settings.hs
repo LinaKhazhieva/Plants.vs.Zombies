@@ -109,7 +109,7 @@ initCards ::
   -> Coords -- ^ Coordinatates of the first card
   -> [Card]
 initCards [] _ = []
-initCards (p:ps) (x, y) = [Card False p (x, y)]
+initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 -- | Starter universe

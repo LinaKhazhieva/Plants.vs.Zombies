@@ -19,17 +19,17 @@ data Zombie = Zombie
 
 -- | Accessor for the speed of the zombies
 zSpeed :: ZombieType -> Float
-zSpeed Basic = 6
-zSpeed Buckethead = 4
+zSpeed Basic = 10
+zSpeed Buckethead = 10
 
 -- | Accessor of the zombies health 
 zHealth :: ZombieType -> Int
-zHealth Basic = 4
-zHealth Buckethead = 6
+zHealth Basic = 200
+zHealth Buckethead = 1300
 
 -- | Accessor of the zombies strength
 zStrength :: ZombieType -> Int
-zStrength _z = 1
+zStrength _z = 100
 
 -- | Accessor to render zombie type
 zPicture :: ZombieType -> Picture
@@ -54,7 +54,7 @@ cMoney Sunflower   = 50
 
 cFrequency :: PlantType -> Float
 cFrequency PeasShooter = 5
-cFrequency Sunflower   = 3
+cFrequency Sunflower   = 5
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower
@@ -80,11 +80,12 @@ data Projectile = Projectile
 
 -- | Accessor for the plant
 pHealth :: PlantType -> Int
-pHealth _p = 1
+pHealth PeasShooter = 300
+pHealth Sunflower   = 300
 
 -- | Accessor for the plant strength
 pStrength :: PlantType -> Int 
-pStrength PeasShooter = 1
+pStrength PeasShooter = 20
 pStrength Sunflower   = 0
 
 -- | Accessor to render plant type
@@ -93,12 +94,12 @@ pPicture PeasShooter = plant
 pPicture Sunflower   = sunflower
 
 pFrequency :: PlantType -> Float
-pFrequency PeasShooter = 5
-pFrequency Sunflower   = 4
+pFrequency PeasShooter = 1.5
+pFrequency Sunflower   = 24
 
 pStarterTimer :: PlantType -> Float
 pStarterTimer PeasShooter = 0
-pStarterTimer Sunflower   = pFrequency Sunflower
+pStarterTimer Sunflower   = 7
 
 prPicture :: ProjectileType -> Picture
 prPicture Sun = sun

@@ -62,7 +62,7 @@ perform :: IO()
 perform = play
           screen
           white
-          6
+          60
           initUniverse
           drawUniverse
           handleUniverse

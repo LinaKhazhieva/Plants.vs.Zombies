@@ -11,7 +11,7 @@ import Settings
 attack
   :: (a -> b -> b)  -- ^ function that changes zombie/plant
   -> [a]            -- ^ zombies/plants that may affect plant/zombie
-  -> b              -- ^ zomvie/plant to affect
+  -> b              -- ^ zombie/plant to affect
   -> b
 attack _f [] b      = b
 attack f (x : xs) b = attack f xs (f x b)
@@ -22,7 +22,7 @@ collisionPlantZombie (xs, ys) p = checkCollision cellWidth cellHeight
 
 collisionPeasZombie :: Coords -> Coords -> Bool
 collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
-                           zombieWidth (zombieHeight / 2) pr (x, y-50)
+                                cellWidth cellHeight pr (x, y - 80)
 
 -- | Function to perform updates on zombie, according
 -- to time passed in the game. Move zombie, if there's
@@ -102,7 +102,7 @@ reduceHealthZombie dt (strength, pr) z
 deleteZombie :: [Zombie] -> [Zombie]
 deleteZombie zs = filter (hasHealth) zs
   where
-    hasHealth z = (zDamage z) <= (zHealth (zType z))
+    hasHealth z = (zDamage z) < (zHealth (zType z))
 
 -- | Function to update plant according to time passed.
 --   It corresponds to lowering the health of the plant,
@@ -114,15 +114,15 @@ updatePlants :: Float -> Universe -> [Plant]
 updatePlants dt u = update ps                     
   where
     update = deletePlant
-           . map (attackPlant u)
+           . map (attackPlant dt u)
            . updateProjectiles dt u
     ps     = uDefense u
 
 -- | Function to lower health of plants
 --   iterate through zombies and lower health
 --   if their timer for bite is exceed
-attackPlant :: Universe -> Plant -> Plant
-attackPlant u = attack reduceHealthPlant zs
+attackPlant :: Float -> Universe -> Plant -> Plant
+attackPlant dt u = attack (reduceHealthPlant dt) zs
   where
     zs = uEnemies u
 
@@ -130,13 +130,13 @@ attackPlant u = attack reduceHealthPlant zs
 --   reduce health of the plant if there's
 --   collision with zombie and their timer
 --   till bite is up
-reduceHealthPlant :: Zombie -> Plant -> Plant
-reduceHealthPlant z p
+reduceHealthPlant :: Float -> Zombie -> Plant -> Plant
+reduceHealthPlant dt z p
   | not (collisionPlantZombie zXY pXY) = p
   | seconds <= 0                       = newP
   | otherwise                          = p
   where
-    seconds     = zSeconds z
+    seconds     = zSeconds z - dt
     zXY         = zCoords z
     pXY         = pCoords p
     newP        = p
@@ -162,8 +162,8 @@ updateProjectiles dt u = map updProjectile
       | otherwise                = sendSun dt p
       where
         update = shootProjectile dt u
-               . moveProjectiles dt
                . deleteProjectile u
+               . moveProjectiles dt
     
 -- | Function to shoot projectile
 -- * if there's no zombie in pea vision -> no shooting performed

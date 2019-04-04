@@ -67,7 +67,7 @@ deltaXProjectile :: Float
 deltaXProjectile = 40
 
 uFrequency :: Float
-uFrequency = 6
+uFrequency = 10
 
 transparentBlack :: Color
 transparentBlack = makeColor 0 0 0 0.57 
@@ -85,11 +85,14 @@ cellCoords =
   , ( 240, 170), ( 240, 70), ( 240, -30), ( 240, -130), ( 240, -225) ]
 
 -- | Predefined wave of enemies
+--   has delta of 80, to render beautifully
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie Basic      (300,  150) 0 0 
-  , Zombie Buckethead (300,   50) 0 0
-  , Zombie Basic      (300,  -50) 0 0
+  [ Zombie Basic (620, 50) 0 0  
+  , Zombie Basic (740, 50) 0 0
+  , Zombie Basic (850, 50) 0 0
+  , Zombie Basic (975, 50) 0 0
+  , Zombie Basic (1000, 50) 0 0
   ]
 
 -- | Predefined defense structure
@@ -102,7 +105,7 @@ samplePlants =
   ]
  
 cards :: [Card]
-cards = initCards [PeasShooter, Sunflower] (-570,  256.5)
+cards = initCards [PeasShooter] (-570,  256.5)
 
 initCards :: 
   [PlantType]
@@ -122,4 +125,4 @@ initUniverse = Universe
                blank
                False
                0
-               50
+               150

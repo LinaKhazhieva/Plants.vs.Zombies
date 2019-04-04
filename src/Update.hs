@@ -17,8 +17,8 @@ attack _f [] b      = b
 attack f (x : xs) b = attack f xs (f x b)
 
 collisionPlantZombie :: Coords -> Coords -> Bool
-collisionPlantZombie z p = checkCollision zombieWidth zombieHeight
-                           plantSize plantSize z p
+collisionPlantZombie (xs, ys) p = checkCollision cellWidth cellHeight
+                                  cellWidth cellHeight (xs, ys - 80) p
 
 collisionPeasZombie :: Coords -> Coords -> Bool
 collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
@@ -210,7 +210,7 @@ moveProjectiles dt p = p { pBullet = move }
     b    = pBullet p
 
 moveProjectile :: Float -> Projectile -> Projectile
-moveProjectile dt pr = Projectile Pea (x + dt * 50, y)
+moveProjectile dt pr = Projectile Pea (x + dt * 250, y)
   where
     (x, y) = prCoords pr
 

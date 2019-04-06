@@ -133,4 +133,3 @@ data Universe = Universe
   }
 
 data State = State Universe [Universe]
-

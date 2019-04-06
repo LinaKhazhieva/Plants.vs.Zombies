@@ -20,10 +20,10 @@ handleCoords mouseCoords (State u us) = (State newU us)
                 , uSuns    = newSuns
                 , uMoney   = updMoney
                 }
-    (newDefense, updCs, newM) = handlePlants mouseCoords u
-    newCards                  = handleCards mouseCoords u updCs
+    (newDefense, updCs, newM) = handlePlants mouseCoords (State u us)
+    newCards                  = handleCards mouseCoords (State u us) updCs
     (newSuns, updMoney)       = if newM == uMoney u
-                                  then handleSuns mouseCoords u newM
+                                  then handleSuns mouseCoords (State u us) newM
                                   else (uSuns u, newM) 
 
 -- | Function to handle picking plant card
@@ -66,10 +66,10 @@ handlePlants mc (State u us)= handle (ps, money)
 --   Find possible cell coordinates or nothing 
 addPlant
   :: Coords
-  -> State
+  -> Universe
   -> ([Plant], Int)
   -> ([Plant], [Card], Int)
-addPlant mc (State u us) (ps, money) = (newPs, newC, m) 
+addPlant mc u (ps, money) = (newPs, newC, m) 
   where
     (newPs, c, m) = putPlant (active, coords) ps money
     active        = listToMaybe (filter isActive cs)
@@ -124,8 +124,8 @@ getCoords xy (x : xs) = if checkMouse xy x cellWidth cellHeight
 --   coordinate intersects with one of the sun in sunflower
 --   If true, deletes the sun and adds money, else returns 
 --   the same list of plant and same amount of money
-collectSun :: Coords -> State -> ([Plant], Int) -> ([Plant], Int)
-collectSun mc (State u us) (ps, m) = if active
+collectSun :: Coords -> Universe -> ([Plant], Int) -> ([Plant], Int)
+collectSun mc u (ps, m) = if active
                              then (ps, m)
                              else (pss ++ remove, m + addMoney)
   where

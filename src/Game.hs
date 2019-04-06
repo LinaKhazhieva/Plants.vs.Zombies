@@ -12,7 +12,7 @@ import Handle
 
 -- | Function to render universe
 drawState :: State -> Picture
-drawUniverse (State u us) = field
+drawState (State u us) = field
                          <> drawObject drawPlant  ps
                          <> drawProjectiles Sun (prs ++ ss)
                          <> drawProjectiles Pea prs
@@ -31,15 +31,15 @@ drawUniverse (State u us) = field
 -- | Function to change universe according
 --   to its rules by the interaction with the player
 handleState :: Event -> State -> State
-handleUniverse (EventKey (MouseButton LeftButton)
+handleState (EventKey (MouseButton LeftButton)
                Down _ mouseCoords) s = handleCoords mouseCoords s
-handleUniverse _  s = s
+handleState _  s = s
 
 -- | Function to change universe according
 --   to its rules by the time passed
 --   detect if the game is over
 updateState :: Float -> State -> State
-updateUniverse dt (State u us)
+updateState dt (State u us)
   | isWon u = State wonU us
   | isLost u = State lostU us
   | otherwise = State newU us

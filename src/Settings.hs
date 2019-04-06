@@ -134,7 +134,7 @@ level2 :: Universe
 level2 = Universe
                 sampleZombies
                 []
-                initCards [PeasShooter, Sunflower] (-570,  256.5)
+                (initCards [PeasShooter, Sunflower] (-570,  256.5))
                 ([], uFrequency)
                 blank
                 False

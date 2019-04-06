@@ -29,8 +29,8 @@ collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
 -- no collision with the plant, reduce health of the
 -- zombie, if there's collision with the plant's 
 -- projectile.
-updateZombies :: Float -> Universe -> [Zombie]
-updateZombies dt u = update zs  
+updateZombies :: Float -> State -> [Zombie]
+updateZombies dt (State u us) = update zs  
   where
     update = map (updateZombie dt u)
            . deleteZombie
@@ -42,8 +42,8 @@ updateZombies dt u = update zs
 -- defense plants and sunflowers and moves zombie further
 -- if there's no collision, otherwise it stays at the same
 -- place.
-updateZombie :: Float -> Universe -> Zombie -> Zombie
-updateZombie dt u z
+updateZombie :: Float -> State -> Zombie -> Zombie
+updateZombie dt (State u us) z
   | True `elem` collisions = bitePlant dt z
   | otherwise              = moveZombie dt z
   where
@@ -76,8 +76,8 @@ moveZombie dt z = z { zCoords = (x - dt * v, y) }
 -- | Function to lower health of zombies
 --   iterate through plants and lower health
 --   if collision with its projectile happened
-attackZombie :: Float -> Universe -> Zombie -> Zombie
-attackZombie dt u = attack (reduceHealthZombie dt) prs
+attackZombie :: Float -> State -> Zombie -> Zombie
+attackZombie dt (State u us) = attack (reduceHealthZombie dt) prs
   where
     newP = filter (\p -> (pType p) == PeasShooter) ps
     prs = concat (map (\p -> 
@@ -110,8 +110,8 @@ deleteZombie zs = filter (hasHealth) zs
 --   Removing plants, if it has no health any more.
 --   Shooting with the peas, if it seas the zombie.
 --   Move projectiles
-updatePlants :: Float -> Universe -> [Plant]
-updatePlants dt u = update ps                     
+updatePlants :: Float -> State-> [Plant]
+updatePlants dt (State u us) = update ps                     
   where
     update = deletePlant
            . map (attackPlant dt u)
@@ -121,8 +121,8 @@ updatePlants dt u = update ps
 -- | Function to lower health of plants
 --   iterate through zombies and lower health
 --   if their timer for bite is exceed
-attackPlant :: Float -> Universe -> Plant -> Plant
-attackPlant dt u = attack (reduceHealthPlant dt) zs
+attackPlant :: Float -> State -> Plant -> Plant
+attackPlant dt (State u us)= attack (reduceHealthPlant dt) zs
   where
     zs = uEnemies u
 
@@ -154,8 +154,8 @@ deletePlant ps = filter (hasHealth) ps
 -- * Perform shooting of projectile;
 -- * Perform moving projectile along x-axis
 -- * Perform deleting projectile
-updateProjectiles :: Float -> Universe -> [Plant] -> [Plant]
-updateProjectiles dt u = map updProjectile
+updateProjectiles :: Float -> State -> [Plant] -> [Plant]
+updateProjectiles dt (State u us)= map updProjectile
   where
     updProjectile p
       | (pType p) == PeasShooter = update p
@@ -171,8 +171,8 @@ updateProjectiles dt u = map updProjectile
 -- * if time to the next shoot is less or equal to zero,
 --   plant generates new projectile
 -- * otherwise lower time till shooting
-shootProjectile :: Float -> Universe -> Plant -> Plant
-shootProjectile dt u p
+shootProjectile :: Float -> State -> Plant -> Plant
+shootProjectile dt (State u us) p
   | not (any (peaVision (pCoords p)) zs) = p
                                           { pSeconds = 0 }
   | seconds <= 0                                     = p
@@ -217,8 +217,8 @@ moveProjectile dt pr = Projectile Pea (x + dt * 250, y)
 -- | Fucntion to delete projectile from the plant
 -- * Delete if projectile moved out of the game border
 -- * Delete if projectile has collision with the zombie
-deleteProjectile :: Universe -> Plant -> Plant
-deleteProjectile u p = p { pBullet = delete prs }
+deleteProjectile :: State-> Plant -> Plant
+deleteProjectile (State u us) p = p { pBullet = delete prs }
   where
     delete          = filter (hasCollision)
                     . filter (outOfBorder)
@@ -249,8 +249,8 @@ sendSun dt p
     newSun  = Projectile Sun (x + 70, y - 25)
     oldSuns = pBullet p
 
-updateSuns :: Float -> Universe -> ([Projectile], Float)
-updateSuns dt u
+updateSuns :: Float -> State-> ([Projectile], Float)
+updateSuns dt (State u us)
   | seconds <= 0 = (send, uFrequency)
   | otherwise    = (ss, seconds)
   where
@@ -259,8 +259,8 @@ updateSuns dt u
     newSun  = Projectile Sun (90, -25) 
     (ss, t) = uSuns u
 
-updateCards :: Float -> Universe -> [Card]
-updateCards dt u = update
+updateCards :: Float -> State -> [Card]
+updateCards dt (State u us)= update
   where
     update = map (updateCard dt) cs
     cs     = uCards u

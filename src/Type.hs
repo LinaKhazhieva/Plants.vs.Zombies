@@ -132,3 +132,4 @@ data Universe = Universe
   , uMoney      :: Int
   }
 
+data State = State Universe [Universe]

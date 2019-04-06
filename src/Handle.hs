@@ -11,14 +11,15 @@ import Utils
 
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
-handleCoords :: Coords -> Universe -> Universe
-handleCoords mouseCoords u = u 
-                { uDefense = newDefense
+handleCoords :: Coords -> State-> State
+handleCoords mouseCoords (State u us) = (State newU us)
+                
+  where
+    newU =  u { uDefense = newDefense
                 , uCards   = newCards
                 , uSuns    = newSuns
                 , uMoney   = updMoney
                 }
-  where
     (newDefense, updCs, newM) = handlePlants mouseCoords u
     newCards                  = handleCards mouseCoords u updCs
     (newSuns, updMoney)       = if newM == uMoney u
@@ -30,8 +31,8 @@ handleCoords mouseCoords u = u
 --   deactivate the active card
 -- * if player clicked on the player invert
 --   its property of active
-handleCards :: Coords -> Universe -> [Card] -> [Card]
-handleCards mXY u cs
+handleCards :: Coords -> State -> [Card] -> [Card]
+handleCards mXY (State u us) cs
   | any isActive cs = map deactivate cs
   | otherwise       = map activate cs
   where
@@ -51,8 +52,8 @@ handleCards mXY u cs
 -- * perform adding plants to the game border
 --
 -- * perform collecting suns
-handlePlants :: Coords -> Universe -> ([Plant], [Card], Int)
-handlePlants mc u = handle (ps, money)
+handlePlants :: Coords -> State -> ([Plant], [Card], Int)
+handlePlants mc (State u us)= handle (ps, money)
   where
     handle = addPlant mc u
            . collectSun mc u
@@ -65,10 +66,10 @@ handlePlants mc u = handle (ps, money)
 --   Find possible cell coordinates or nothing 
 addPlant
   :: Coords
-  -> Universe
+  -> State
   -> ([Plant], Int)
   -> ([Plant], [Card], Int)
-addPlant mc u (ps, money) = (newPs, newC, m) 
+addPlant mc (State u us) (ps, money) = (newPs, newC, m) 
   where
     (newPs, c, m) = putPlant (active, coords) ps money
     active        = listToMaybe (filter isActive cs)
@@ -123,8 +124,8 @@ getCoords xy (x : xs) = if checkMouse xy x cellWidth cellHeight
 --   coordinate intersects with one of the sun in sunflower
 --   If true, deletes the sun and adds money, else returns 
 --   the same list of plant and same amount of money
-collectSun :: Coords -> Universe -> ([Plant], Int) -> ([Plant], Int)
-collectSun mc u (ps, m) = if active
+collectSun :: Coords -> State -> ([Plant], Int) -> ([Plant], Int)
+collectSun mc (State u us) (ps, m) = if active
                              then (ps, m)
                              else (pss ++ remove, m + addMoney)
   where
@@ -181,8 +182,8 @@ isCollected mc ss = collected
 --   if mouse coordinate intersects with one of the sun
 --   If true, deletes the sun and adds money, else returns 
 --   the same list of projectiles and same amount of money
-handleSuns :: Coords -> Universe -> Int -> (([Projectile], Float), Int)
-handleSuns mc u m = if active
+handleSuns :: Coords -> State -> Int -> (([Projectile], Float), Int)
+handleSuns mc (State u us) m = if active
                       then ((ss, t), m)
                       else ((remove, t), m + addMoney)
   where

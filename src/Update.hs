@@ -29,8 +29,8 @@ collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
 -- no collision with the plant, reduce health of the
 -- zombie, if there's collision with the plant's 
 -- projectile.
-updateZombies :: Float -> Universe -> [Zombie]
-updateZombies dt u = update zs  
+updateZombies :: Float -> State -> [Zombie]
+updateZombies dt (State u us) = update zs  
   where
     update = map (updateZombie dt u)
            . deleteZombie

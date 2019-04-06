@@ -11,15 +11,15 @@ import Update
 import Handle
 
 -- | Function to render universe
-drawUniverse :: Universe -> Picture
-drawUniverse u = field
-              <> drawObject drawPlant  ps
-              <> drawProjectiles Sun (prs ++ ss)
-              <> drawProjectiles Pea prs
-              <> drawObject drawZombie zs
-              <> drawObject (drawCard m) cs
-              <> drawMoney m 
-              <> uScreen u
+drawState :: State -> Picture
+drawUniverse (State u us) = field
+                         <> drawObject drawPlant  ps
+                         <> drawProjectiles Sun (prs ++ ss)
+                         <> drawProjectiles Pea prs
+                         <> drawObject drawZombie zs
+                         <> drawObject (drawCard m) cs
+                         <> drawMoney m 
+                         <> uScreen u
   where
     prs      = concat (map pBullet ps)
     zs       = uEnemies u
@@ -30,40 +30,45 @@ drawUniverse u = field
 
 -- | Function to change universe according
 --   to its rules by the interaction with the player
-handleUniverse :: Event -> Universe -> Universe
+handleState :: Event -> State -> State
 handleUniverse (EventKey (MouseButton LeftButton)
-               Down _ mouseCoords) u = handleCoords mouseCoords u
-handleUniverse _  u = u
+               Down _ mouseCoords) s = handleCoords mouseCoords s
+handleUniverse _  s = s
 
 -- | Function to change universe according
 --   to its rules by the time passed
 --   detect if the game is over
-updateUniverse :: Float -> Universe -> Universe
-updateUniverse dt u
-  | isWon u = u
-         { uScreen = win }
-  | isLost u = u
-         { uScreen = lost }
-  | otherwise = u
+updateState :: Float -> State -> State
+updateUniverse dt (State u us)
+  | isWon u = State wonU us
+  | isLost u = State lostU us
+  | otherwise = State newU us
+  where
+    newEnemies = updateZombies dt (State u us) 
+    newDefense = updatePlants dt (State u us)
+    newSuns    = updateSuns dt (State u us)
+    newCards   = updateCards dt (State u us)
+    newTime    = (uTime u) + dt
+    wonU       = u
+     { uScreen = win }
+    lostU      = u
+     { uScreen = lost }
+    newU       = u
         { uEnemies = newEnemies
         , uDefense = newDefense
         , uCards   = newCards
         , uSuns    = newSuns
         , uTime    = newTime
         }
-  where
-    newEnemies = updateZombies dt u 
-    newDefense = updatePlants dt u
-    newSuns    = updateSuns dt u
-    newCards   = updateCards dt u
-    newTime    = (uTime u) + dt
+
+
 
 perform :: IO()
 perform = play
           screen
           white
           60
-          initUniverse
-          drawUniverse
-          handleUniverse
-          updateUniverse
+          initState
+          drawState
+          handleState
+          updateState

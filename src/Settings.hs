@@ -115,14 +115,29 @@ initCards [] _ = []
 initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
+initState :: State
+initState = State level1 [level1, level2]
+
 -- | Starter universe
-initUniverse :: Universe
-initUniverse = Universe 
+level1 :: Universe
+level1 = Universe 
                sampleZombies
-               samplePlants
+               []
                cards
                ([], uFrequency)
                blank
                False
                0
                150
+
+level2 :: Universe
+level2 = Universe
+                sampleZombies
+                []
+                initCards [PeasShooter, Sunflower] (-570,  256.5)
+                ([], uFrequency)
+                blank
+                False
+                0
+                50
+

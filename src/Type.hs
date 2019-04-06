@@ -130,6 +130,13 @@ data Universe = Universe
   , uOver       :: Bool                  -- ^ denotes if the game is over
   , uTime       :: Float                 -- ^ amount of time passed since start
   , uMoney      :: Int
+  , uLevelNum   :: Int
+  , uStage      :: Int                 
   }
+
+newScreen :: Int -> Int -> Picture
+newScreen _ 1 = sunflowerCard
+newScreen _ 2 = levelOne
+newScreen _ _ = blank
 
 data State = State Universe [Universe]

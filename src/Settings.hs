@@ -5,6 +5,7 @@ module Settings where
 
 import Type
 import Graphics.Gloss
+import Structure.Object
 
 begginnerCoords :: Float
 begginnerCoords = -450
@@ -116,7 +117,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State level1 [level1, level2]
+initState = State level1 [level2]
 
 -- | Starter universe
 level1 :: Universe
@@ -129,6 +130,8 @@ level1 = Universe
                False
                0
                150
+               1
+               0
 
 level2 :: Universe
 level2 = Universe
@@ -140,4 +143,6 @@ level2 = Universe
                 False
                 0
                 50
+                2
+                0
 

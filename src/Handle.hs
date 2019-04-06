@@ -12,8 +12,12 @@ import Utils
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
-handleCoords mouseCoords (State u us) = (State newU us)
-                
+handleCoords mouseCoords (State u []) = State u []
+handleCoords mouseCoords (State u (next:us))
+  | isWon u && uStage u == 1   = State stage2 (next:us)
+  | isWon u && uStage u == 2   = State next us
+  | not (isWon u)              = State newU (next:us)
+  | otherwise                  = State u (next:us)              
   where
     newU =  u { uDefense = newDefense
                 , uCards   = newCards
@@ -24,7 +28,10 @@ handleCoords mouseCoords (State u us) = (State newU us)
     newCards                  = handleCards mouseCoords (State u us) updCs
     (newSuns, updMoney)       = if newM == uMoney u
                                   then handleSuns mouseCoords (State u us) newM
-                                  else (uSuns u, newM) 
+                                  else (uSuns u, newM)
+    stage2 = u { uScreen = newScreen (uLevelNum u) 2
+               , uStage  = 2 }
+
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked

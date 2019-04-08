@@ -135,6 +135,11 @@ lost = pic
   where 
     pic = loadPicture "images/lose.bmp" 
 
+levelOne :: Picture
+levelOne = pic
+  where
+    pic = loadPicture "images/level1.bmp"
+
 win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 

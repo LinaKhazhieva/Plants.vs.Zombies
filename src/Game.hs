@@ -40,9 +40,10 @@ handleState _  s = s
 --   detect if the game is over
 updateState :: Float -> State -> State
 updateState dt (State u us)
-  | isWon u = State wonU us
-  | isLost u = State lostU us
-  | otherwise = State newU us
+  | isWon u && uStage u == 0   = State wonU us
+  | isLost u                   = State lostU us
+  | not (isWon u)              = State newU us
+  | otherwise                  = State u us
   where
     newEnemies = updateZombies dt (State u us) 
     newDefense = updatePlants dt (State u us)
@@ -50,7 +51,9 @@ updateState dt (State u us)
     newCards   = updateCards dt (State u us)
     newTime    = (uTime u) + dt
     wonU       = u
-     { uScreen = win }
+     { uScreen = newScreen (uLevelNum u) 1
+     , uStage  = 1
+     }
     lostU      = u
      { uScreen = lost }
     newU       = u
@@ -60,7 +63,6 @@ updateState dt (State u us)
         , uSuns    = newSuns
         , uTime    = newTime
         }
-
 
 
 perform :: IO()

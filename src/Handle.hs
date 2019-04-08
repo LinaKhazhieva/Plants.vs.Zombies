@@ -12,27 +12,44 @@ import Utils
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
-handleCoords mouseCoords (State u us) = (State newU us)
-                
+handleCoords mouseCoords (State u [])
+  | isWon u && uStage u == 1   = State (handleNextScreen u) []
+  | not (isWon u)              = State (handleProcess mouseCoords u) []
+  | otherwise                  = State u []
+handleCoords mouseCoords (State u (next:us))
+  | isWon u && uStage u == 1   = State (handleNextScreen u) (next:us)
+  | isWon u && uStage u == 2   = State next us
+  | not (isWon u)              = State (handleProcess mouseCoords u) (next:us)
+  | otherwise                  = State u (next:us)              
+ 
+
+handleProcess :: Coords -> Universe -> Universe
+handleProcess mc u = u
+        { uDefense = newDefense
+        , uCards   = newCards
+        , uSuns    = newSuns
+        , uMoney   = updMoney
+        }
   where
-    newU =  u { uDefense = newDefense
-                , uCards   = newCards
-                , uSuns    = newSuns
-                , uMoney   = updMoney
-                }
-    (newDefense, updCs, newM) = handlePlants mouseCoords (State u us)
-    newCards                  = handleCards mouseCoords (State u us) updCs
+    (newDefense, updCs, newM) = handlePlants mc u
+    newCards                  = handleCards mc u updCs
     (newSuns, updMoney)       = if newM == uMoney u
-                                  then handleSuns mouseCoords (State u us) newM
-                                  else (uSuns u, newM) 
+                                  then handleSuns mc u newM
+                                  else (uSuns u, newM)
+
+handleNextScreen :: Universe -> Universe
+handleNextScreen u = u
+         { uScreen = newScreen (uLevelNum u) 2
+         , uStage  = 2
+         }
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
 --   deactivate the active card
 -- * if player clicked on the player invert
 --   its property of active
-handleCards :: Coords -> State -> [Card] -> [Card]
-handleCards mXY (State u us) cs
+handleCards :: Coords -> Universe -> [Card] -> [Card]
+handleCards mXY u cs
   | any isActive cs = map deactivate cs
   | otherwise       = map activate cs
   where
@@ -52,8 +69,8 @@ handleCards mXY (State u us) cs
 -- * perform adding plants to the game border
 --
 -- * perform collecting suns
-handlePlants :: Coords -> State -> ([Plant], [Card], Int)
-handlePlants mc (State u us)= handle (ps, money)
+handlePlants :: Coords -> Universe -> ([Plant], [Card], Int)
+handlePlants mc u = handle (ps, money)
   where
     handle = addPlant mc u
            . collectSun mc u
@@ -182,8 +199,8 @@ isCollected mc ss = collected
 --   if mouse coordinate intersects with one of the sun
 --   If true, deletes the sun and adds money, else returns 
 --   the same list of projectiles and same amount of money
-handleSuns :: Coords -> State -> Int -> (([Projectile], Float), Int)
-handleSuns mc (State u us) m = if active
+handleSuns :: Coords -> Universe -> Int -> (([Projectile], Float), Int)
+handleSuns mc u m = if active
                       then ((ss, t), m)
                       else ((remove, t), m + addMoney)
   where

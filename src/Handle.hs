@@ -24,13 +24,23 @@ handleCoords mouseCoords (State u (next:us))
  
 
 handleProcess :: Coords -> Universe -> Universe
-handleProcess mc u = u
-        { uDefense = newDefense
-        , uCards   = newCards
-        , uSuns    = newSuns
-        , uMoney   = updMoney
-        }
+handleProcess mc u = changeScreen
   where
+    isButton                  = checkMouse mc (600, 260) 175 70
+    changeScreen              = if isButton
+                                  then newU
+                                  else handleU
+    newU                      = u
+                    { uScreen = newScreen (uLevelNum u) 3
+                    , uStage  = 3
+                    }
+    handleU                   = u
+                   { uDefense = newDefense
+                   , uCards   = newCards
+                   , uSuns    = newSuns
+                   , uMoney   = updMoney
+                   }
+
     (newDefense, updCs, newM) = handlePlants mc u
     newCards                  = handleCards mc u updCs
     (newSuns, updMoney)       = if newM == uMoney u

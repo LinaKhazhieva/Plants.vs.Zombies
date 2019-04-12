@@ -5,9 +5,7 @@ module Structure.Object where
 
 import Graphics.Gloss
 import System.IO.Unsafe (unsafePerformIO)
-
-loadPicture :: String -> Picture
-loadPicture path = unsafePerformIO $ loadBMP path
+import Structure.Alphabet
 
 screenWidth :: Int
 screenWidth = 1400
@@ -60,73 +58,24 @@ sunflowerCard = scale 0.52 0.52 pic
   where
     pic = loadPicture "images/sunflowercard.bmp"
 
-one :: Picture
-one = pic
+menu :: Picture
+menu = pic
   where
-    pic = loadPicture "images/one.bmp"
+    pic = loadPicture "images/menu.bmp"
 
-two :: Picture
-two = pic
+user :: Picture
+user = pic
   where
-    pic = loadPicture "images/two.bmp"
+    pic = loadPicture "images/user.bmp"
 
-three :: Picture
-three = pic
+menuButton :: Picture
+menuButton = pic
   where
-    pic = loadPicture "images/three.bmp"
-
-four :: Picture
-four = pic
-  where
-    pic = loadPicture "images/four.bmp"
-
-five :: Picture
-five = pic
-  where
-    pic = loadPicture "images/five.bmp"
-
-six :: Picture
-six = pic
-  where
-    pic = loadPicture "images/six.bmp"
-
-seven :: Picture
-seven = pic
-  where
-    pic = loadPicture "images/seven.bmp"
-
-eight :: Picture
-eight = pic
-  where
-    pic = loadPicture "images/eight.bmp"
-
-nine :: Picture
-nine = pic
-  where
-    pic = loadPicture "images/nine.bmp"
-
-zero :: Picture
-zero = pic
-  where
-    pic = loadPicture "images/zero.bmp"
+    pic = loadPicture "images/menu_button.bmp"
 
 field :: Picture
 field = pic 
      <> Translate (-461.25) 256.5 cardBlock
---     <> line [(-408, -300), (-408, 300)]
---     <> line [(-325, -300), (-325, 300)]
---     <> line [(-245, -300), (-245, 300)]
---     <> line [(-158, -300), (-158, 300)]
---     <> line [(-80, -300), (-80, 300)]
---     <> line [(0, -300), (0, 300)]
---     <> line [(80, -300), (80, 300)]
---     <> line [(155, -300), (155, 300)]
---     <> line [(240, -300), (240, 300)]
---     <> line [(-700, 170), (700, 170)]
---     <> line [(-700, 70), (700, 70)]
---     <> line [(-700, -30), (700, -30)]
---     <> line [(-700, -130), (700, -130)]
---     <> line [(-700, -225), (700, -225)]
   where
     pic = unsafePerformIO $ loadBMP "images/Background.bmp"
 

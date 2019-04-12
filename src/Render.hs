@@ -6,6 +6,7 @@ module Render where
 import Graphics.Gloss
 import Type
 import Settings
+import Structure.Object
 
 -- | High-level function to draw an object
 -- of the game on the screen
@@ -72,4 +73,5 @@ moveDigits (d : ds) = Translate x 0 d <> moveDigits ds
   where
     x = -12 * fromIntegral (length ds)
     
-    
+renderMenuButton :: Picture
+renderMenuButton = Translate 600 260 menuButton 

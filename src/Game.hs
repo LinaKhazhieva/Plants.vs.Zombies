@@ -12,7 +12,7 @@ import Handle
 
 -- | Function to render universe
 drawState :: State -> Picture
-drawState (State u us) = field
+drawState (State u us) = field <> renderMenuButton
                          <> drawObject drawPlant  ps
                          <> drawProjectiles Sun (prs ++ ss)
                          <> drawProjectiles Pea prs

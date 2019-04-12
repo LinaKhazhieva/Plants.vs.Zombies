@@ -1,6 +1,7 @@
 module Type where
 
 import Structure.Object
+import Structure.Alphabet
 import Graphics.Gloss
 
 -- | Type for coordinates on the field
@@ -137,6 +138,8 @@ data Universe = Universe
 newScreen :: Int -> Int -> Picture
 newScreen _ 1 = sunflowerCard
 newScreen _ 2 = levelOne
+newScreen _ 3 = menu
+newScreen _ 4 = menu <> user <> a
 newScreen _ _ = blank
 
 data State = State Universe [Universe]

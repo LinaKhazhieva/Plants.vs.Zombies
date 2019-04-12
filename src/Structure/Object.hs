@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
+ {-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Structure.Object where
@@ -44,6 +44,11 @@ sunflower :: Picture
 sunflower = pic
   where
     pic = loadPicture "images/sunflower.bmp"
+wallnut :: Picture
+wallnut = pic 
+  where 
+    pic = loadPicture "images/Wallnut.bmp"
+
 
 cardBlock :: Picture
 cardBlock = scale 0.5 0.5 pic
@@ -59,6 +64,11 @@ sunflowerCard :: Picture
 sunflowerCard = scale 0.52 0.52 pic
   where
     pic = loadPicture "images/sunflowercard.bmp"
+
+wallnutCard :: Picture
+sunflowerCard = scale 0.52 0.52 pic
+  where
+    pic = loadPicture "images/wallnutcard.bmp"
 
 one :: Picture
 one = pic
@@ -143,5 +153,12 @@ levelOne = pic
 win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 
+zombienote :: Picture 
+zombienote = pic 
+  where
+    pic = loadPicture "zombienote.bmp"
+
+
 screen :: Display
 screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)
+

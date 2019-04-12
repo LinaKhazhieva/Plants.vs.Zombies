@@ -66,7 +66,7 @@ sunflowerCard = scale 0.52 0.52 pic
     pic = loadPicture "images/sunflowercard.bmp"
 
 wallnutCard :: Picture
-sunflowerCard = scale 0.52 0.52 pic
+wallnutCard= scale 0.52 0.52 pic
   where
     pic = loadPicture "images/wallnutcard.bmp"
 

@@ -135,8 +135,10 @@ data Universe = Universe
   }
 
 newScreen :: Int -> Int -> Picture
-newScreen _ 1 = sunflowerCard
-newScreen _ 2 = levelOne
+newScreen 1 1 = sunflowerCard
+newScreen 1 2 = sunflowerAlmanac
+newScreen 2 1 = zombieNote
+newScreen 2 2 = zombieNote
 newScreen _ _ = blank
 
 data State = State Universe [Universe]

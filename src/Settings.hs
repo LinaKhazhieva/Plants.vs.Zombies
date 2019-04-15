@@ -96,6 +96,7 @@ sampleZombies =
   , Zombie Basic (1000, 50) 0 0
   ]
 
+
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
@@ -117,7 +118,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State level1 [level2]
+initState = State level2 [level2]
 
 -- | Starter universe
 level1 :: Universe
@@ -145,4 +146,19 @@ level2 = Universe
                 50
                 2
                 0
+
+
+level3 :: Universe
+level3 = Universe
+                sampleZombies
+                []
+                (initCards [PeasShooter, Sunflower] (-570,  256.5))
+                ([], uFrequency)
+                blank
+                False
+                0
+                50
+                2
+                0
+
 

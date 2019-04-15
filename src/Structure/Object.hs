@@ -145,18 +145,23 @@ lost = pic
   where 
     pic = loadPicture "images/lose.bmp" 
 
-levelOne :: Picture
-levelOne = pic
+sunflowerAlmanac :: Picture
+sunflowerAlmanac = pic
   where
-    pic = loadPicture "images/level1.bmp"
+    pic = loadPicture "images/sunflowerAlmanac.bmp"
+
+wallnutAlmanac :: Picture 
+wallnutAlmanac = pic 
+  where 
+    pic = loadPicture "images/wallnutAlmanac.bmp"    
 
 win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 
-zombienote :: Picture 
-zombienote = pic 
+zombieNote :: Picture 
+zombieNote = pic 
   where
-    pic = loadPicture "zombienote.bmp"
+    pic = loadPicture "images/zombieNote.bmp"
 
 
 screen :: Display

@@ -3,10 +3,11 @@
 
 module Render where
 
-import Graphics.Gloss
-import Type
-import Settings
-import Structure.Object
+import           Graphics.Gloss
+import           Settings
+import           Structure.Alphabet (numPicture)
+import           Structure.Object
+import           Type
 
 -- | High-level function to draw an object
 -- of the game on the screen
@@ -16,7 +17,7 @@ drawObject draw xs = pictures (map draw xs)
 -- | Function to render zombie on the
 -- screen
 drawZombie :: Zombie -> Picture
-drawZombie z = Translate x y pic 
+drawZombie z = Translate x y pic
   where
     (x, y) = zCoords z
     pic = zPicture (zType z)
@@ -43,16 +44,16 @@ drawProjectiles t prs = drawObject drawProjectile newPrs
 drawCard :: Int -> Card -> Picture
 drawCard m card
   | cond      = pic <> color transparentBlack rctngl
-  | otherwise = pic 
+  | otherwise = pic
   where
-    cond       = m < cMoney (plantType card) || cTime card > 0 
+    cond       = m < cMoney (plantType card) || cTime card > 0
     rctngl     = Translate x y (rectangleSolid cardWidth cardHeight)
     pic        = Translate x y (border <> cPicture (plantType card))
     border     = if (isActive card)
                  then drawLining
                  else blank
-    drawLining = color cardLiningColor (rectangleSolid 
-                 (cardWidth + cardLiningThickness * 2) 
+    drawLining = color cardLiningColor (rectangleSolid
+                 (cardWidth + cardLiningThickness * 2)
                  (cardHeight + cardLiningThickness * 2))
     (x, y)     = cCoords card
 
@@ -65,13 +66,13 @@ digits :: Int -> [Int]
 digits n = map (\x -> read [x] :: Int) (show n)
 
 renderMoney :: Int -> Picture
-renderMoney m = moveDigits (map digitToPic (digits m))
+renderMoney = numPicture -- m = moveDigits (map digitToPic (digits m))
 
 moveDigits :: [Picture] -> Picture
 moveDigits []       = blank
 moveDigits (d : ds) = Translate x 0 d <> moveDigits ds
   where
     x = -12 * fromIntegral (length ds)
-    
+
 renderMenuButton :: Picture
-renderMenuButton = Translate 600 260 menuButton 
+renderMenuButton = Translate 600 260 menuButton

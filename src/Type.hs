@@ -1,8 +1,8 @@
 module Type where
 
-import Structure.Object
-import Structure.Alphabet
-import Graphics.Gloss
+import           Graphics.Gloss
+import           Structure.Alphabet
+import           Structure.Object
 
 -- | Type for coordinates on the field
 type Coords = (Float, Float)
@@ -12,20 +12,20 @@ data ZombieType = Basic | Buckethead
 
 -- | Data type for Zombie
 data Zombie = Zombie
-  { zType     :: ZombieType
-  , zCoords   :: Coords     -- ^ coordinates of zombie
-  , zDamage   :: Int        -- ^ damage the zombie received
-  , zSeconds  :: Float      -- ^ seconds tha is left till zombie bite
+  { zType    :: ZombieType
+  , zCoords  :: Coords     -- ^ coordinates of zombie
+  , zDamage  :: Int        -- ^ damage the zombie received
+  , zSeconds :: Float      -- ^ seconds tha is left till zombie bite
   }
 
 -- | Accessor for the speed of the zombies
 zSpeed :: ZombieType -> Float
-zSpeed Basic = 10
+zSpeed Basic      = 10
 zSpeed Buckethead = 10
 
--- | Accessor of the zombies health 
+-- | Accessor of the zombies health
 zHealth :: ZombieType -> Int
-zHealth Basic = 200
+zHealth Basic      = 200
 zHealth Buckethead = 1300
 
 -- | Accessor of the zombies strength
@@ -34,15 +34,15 @@ zStrength _z = 100
 
 -- | Accessor to render zombie type
 zPicture :: ZombieType -> Picture
-zPicture Basic = basicZombie
+zPicture Basic      = basicZombie
 zPicture Buckethead = bucketheadZombie
 
 -- | One particular card
 data Card = Card
-  { isActive   :: Bool      -- ^ is Card currently chosen
-  , plantType  :: PlantType -- ^ type of Plant to plant if Card is active
-  , cCoords    :: Coords    -- ^ Card coordinates
-  , cTime      :: Float
+  { isActive  :: Bool      -- ^ is Card currently chosen
+  , plantType :: PlantType -- ^ type of Plant to plant if Card is active
+  , cCoords   :: Coords    -- ^ Card coordinates
+  , cTime     :: Float
   }
 
 cPicture :: PlantType -> Picture
@@ -63,11 +63,11 @@ data PlantType = PeasShooter | Sunflower
 
 -- | Data type for Plants
 data Plant = Plant
-  { pType     :: PlantType
-  , pCoords   :: Coords       -- ^ coordinates of plants
-  , pDamage   :: Int          -- ^ damage the plant received
-  , pBullet   :: [Projectile] -- ^ peas of the plant
-  , pSeconds  :: Float        -- ^ seconds that is left till the plant shoots
+  { pType    :: PlantType
+  , pCoords  :: Coords       -- ^ coordinates of plants
+  , pDamage  :: Int          -- ^ damage the plant received
+  , pBullet  :: [Projectile] -- ^ peas of the plant
+  , pSeconds :: Float        -- ^ seconds that is left till the plant shoots
   }
 
 data ProjectileType = Sun | Pea
@@ -85,7 +85,7 @@ pHealth PeasShooter = 300
 pHealth Sunflower   = 300
 
 -- | Accessor for the plant strength
-pStrength :: PlantType -> Int 
+pStrength :: PlantType -> Int
 pStrength PeasShooter = 20
 pStrength Sunflower   = 0
 
@@ -121,25 +121,25 @@ digitToPic _ = blank
 
 -- | Data type for whole Universe
 data Universe = Universe
-  { uEnemies    :: [Zombie]              -- ^ predefined wave
-  , uDefense    :: [Plant]               -- ^ list of plants that player put
-  , uCards      :: [Card]                -- ^ cards of plants to plant
-  , uSuns       :: ([Projectile], Float) -- ^ suns falling from the sky,
+  { uEnemies  :: [Zombie]              -- ^ predefined wave
+  , uDefense  :: [Plant]               -- ^ list of plants that player put
+  , uCards    :: [Card]                -- ^ cards of plants to plant
+  , uSuns     :: ([Projectile], Float) -- ^ suns falling from the sky,
                                          -- with time left to create the sun
-  , uScreen     :: Picture               -- ^ special screen to denote
+  , uScreen   :: Picture               -- ^ special screen to denote
                                          -- the game over
-  , uOver       :: Bool                  -- ^ denotes if the game is over
-  , uTime       :: Float                 -- ^ amount of time passed since start
-  , uMoney      :: Int
-  , uLevelNum   :: Int
-  , uStage      :: Int                 
+  , uOver     :: Bool                  -- ^ denotes if the game is over
+  , uTime     :: Float                 -- ^ amount of time passed since start
+  , uMoney    :: Int
+  , uLevelNum :: Int
+  , uStage    :: Int
   }
 
 newScreen :: Int -> Int -> Picture
 newScreen _ 1 = sunflowerCard
 newScreen _ 2 = levelOne
 newScreen _ 3 = menu
-newScreen _ 4 = menu <> user <> a
+newScreen _ 4 = menu <> user <> strPicture "hello world!11"
 newScreen _ _ = blank
 
 data State = State Universe [Universe]

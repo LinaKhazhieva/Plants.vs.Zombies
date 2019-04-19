@@ -96,6 +96,24 @@ sampleZombies =
   , Zombie Basic (1000, 50) 0 0
   ]
 
+zombieLvl3 :: [Zombie]
+zombieLvl3 = 
+  [ Zombie Basic (620, 250) 0 0  
+  , Zombie Basic (1000, -145) 0 0
+  , Zombie Basic (1200, 50) 0 0
+  , Zombie Basic (1400, 50) 0 0
+  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1800, 50) 0 0
+  , Zombie Basic (2000, -50) 0 0
+  , Zombie Basic (2000, -160) 0 0
+  , Zombie Buckethead (2000, 150) 0 0
+  ]
+  -- data Zombie = Zombie
+  -- { zType     :: ZombieType
+  -- , zCoords   :: Coords     -- ^ coordinates of zombie
+  -- , zDamage   :: Int        -- ^ damage the zombie received
+  -- , zSeconds  :: Float      -- ^ seconds tha is left till zombie bite
+  -- }
 
 -- | Predefined defense structure
 samplePlants :: [Plant]
@@ -109,6 +127,7 @@ samplePlants =
 cards :: [Card]
 cards = initCards [PeasShooter] (-570,  256.5)
 
+
 initCards :: 
   [PlantType]
   -> Coords -- ^ Coordinatates of the first card
@@ -118,7 +137,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State level2 [level2]
+initState = State level3 [level2]
 
 -- | Starter universe
 level1 :: Universe
@@ -150,9 +169,9 @@ level2 = Universe
 
 level3 :: Universe
 level3 = Universe
-                sampleZombies
+                zombieLvl3
                 []
-                (initCards [PeasShooter, Sunflower] (-570,  256.5))
+                (initCards [PeasShooter, Sunflower, Wallnut] (-570,  256.5))
                 ([], uFrequency)
                 blank
                 False

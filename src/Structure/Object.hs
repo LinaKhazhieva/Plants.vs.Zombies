@@ -159,9 +159,14 @@ win :: Picture
 win = Translate (-200) 0 (scale 0.5 0.5 (text "You won"))
 
 zombieNote :: Picture 
-zombieNote = pic 
+zombieNote = scale 0.5 0.5  pic 
   where
     pic = loadPicture "images/zombieNote.bmp"
+
+zombieNoteNextLvl :: Picture
+zombieNoteNextLvl = scale 0.5 0.5 pic 
+  where 
+    pic = loadPicture "images/zombieNoteNextLvl.bmp"
 
 
 screen :: Display

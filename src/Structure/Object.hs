@@ -163,6 +163,11 @@ zombieNote = scale 0.5 0.5  pic
   where
     pic = loadPicture "images/zombieNote.bmp"
 
+finalNote :: Picture 
+finalNote = scale 0.5 0.5  pic 
+  where
+    pic = loadPicture "images/finalNote.bmp"    
+
 zombieNoteNextLvl :: Picture
 zombieNoteNextLvl = scale 0.5 0.5 pic 
   where 

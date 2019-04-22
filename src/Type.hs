@@ -57,7 +57,7 @@ cMoney Wallnut = 50
 cFrequency :: PlantType -> Float
 cFrequency PeasShooter = 5
 cFrequency Sunflower   = 5
-cFrequency Wallnut = 5
+cFrequency Wallnut = 5  
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower | Wallnut
@@ -147,6 +147,12 @@ newScreen 1 1 = sunflowerCard
 newScreen 1 2 = sunflowerAlmanac
 newScreen 2 1 = zombieNote
 newScreen 2 2 = zombieNoteNextLvl
+newScreen 3 1 = wallnutCard
+newScreen 3 2 = wallnutAlmanac
+newScreen 4 1 = zombieNote
+newScreen 4 2 = zombieNoteNextLvl
+newScreen 5 1 = finalNote
+newScreen 5 2 = finalNote
 newScreen _ _ = blank
 
 data State = State Universe [Universe]

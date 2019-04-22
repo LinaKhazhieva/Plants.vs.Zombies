@@ -96,6 +96,9 @@ sampleZombies =
   , Zombie Basic (1000, 50) 0 0
   ]
 
+checkWave :: [Zombie]
+checkWave = 
+  [Zombie Basic (620, 50) 0 0]
 zombieLvl3 :: [Zombie]
 zombieLvl3 = 
   [ Zombie Basic (620, 250) 0 0  
@@ -105,7 +108,7 @@ zombieLvl3 =
   , Zombie Basic (1600, 50) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
-  , Zombie Basic (2000, -160) 0 0
+  , Zombie Basic (2000, -145) 0 0
   , Zombie Buckethead (2000, 150) 0 0
   ]
   -- data Zombie = Zombie
@@ -114,6 +117,44 @@ zombieLvl3 =
   -- , zDamage   :: Int        -- ^ damage the zombie received
   -- , zSeconds  :: Float      -- ^ seconds tha is left till zombie bite
   -- }
+zombieLvl4 :: [Zombie]
+zombieLvl4 = 
+  [ Zombie Basic (620, 250) 0 0  
+  , Zombie Basic (1000, -145) 0 0
+  , Zombie Basic (1200, 50) 0 0
+  , Zombie Basic (1400, 50) 0 0
+  , Zombie Basic (1600, 50) 0 0
+  , Zombie Buckethead (1800, 50) 0 0
+  , Zombie Buckethead (1820, 50) 0 0
+  , Zombie Basic (1840, 50) 0 0
+  , Zombie Buckethead (1860, 150) 0 0
+  , Zombie Basic (2020, -50) 0 0
+  , Zombie Basic (2040, -145) 0 0
+  , Zombie Buckethead (2060, 150) 0 0
+  ]
+
+zombieLvl5 :: [Zombie]
+zombieLvl5 = 
+  [ Zombie Basic (620, 250) 0 0  
+  , Zombie Basic (1000, -145) 0 0
+  , Zombie Basic (1200, 50) 0 0
+  , Zombie Basic (1400, 50) 0 0
+  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1800, 50) 0 0
+  , Zombie Basic (2000, -50) 0 0
+  , Zombie Basic (2000, -145) 0 0
+  , Zombie Buckethead (2000, 150) 0 0
+  , Zombie Basic (2000, 50) 0 0
+  , Zombie Basic (2000, 150) 0 0
+  , Zombie Buckethead (2000, 150) 0 0
+  , Zombie Buckethead (2200, 50) 0 0
+  , Zombie Basic (2200, 250) 0 0 
+  , Zombie Basic (2300, -145) 0 0 
+  , Zombie Basic (2400, -50) 0 0 
+  , Zombie Buckethead (2500, 150) 0 0
+  , Zombie Buckethead (2520, 150) 0 0
+  ]
+
 
 -- | Predefined defense structure
 samplePlants :: [Plant]
@@ -137,7 +178,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State level3 [level2]
+initState = State level1 [level2, level3, level4, level5 ]
 
 -- | Starter universe
 level1 :: Universe
@@ -171,13 +212,39 @@ level3 :: Universe
 level3 = Universe
                 zombieLvl3
                 []
+                (initCards [PeasShooter, Sunflower] (-570,  256.5))
+                ([], uFrequency)
+                blank
+                False
+                0
+                50
+                3
+                0
+
+level4 :: Universe
+level4 = Universe
+                zombieLvl4
+                []
                 (initCards [PeasShooter, Sunflower, Wallnut] (-570,  256.5))
                 ([], uFrequency)
                 blank
                 False
                 0
                 50
-                2
+                4
+                0
+
+level5 :: Universe
+level5 = Universe
+                zombieLvl5
+                []
+                (initCards [PeasShooter, Sunflower, Wallnut] (-570,  256.5))
+                ([], uFrequency)
+                blank
+                False
+                0
+                50
+                5
                 0
 
 

@@ -99,6 +99,17 @@ sampleZombies =
 checkWave :: [Zombie]
 checkWave = 
   [Zombie Basic (620, 50) 0 0]
+
+zombieLvl2 :: [Zombie]
+zombieLvl2 =
+  [Zombie Basic (620, 150) 0 0
+  , Zombie Basic (740, 50) 0 0
+  , Zombie Basic (820, 50) 0 0
+  , Zombie Basic (920, -50) 0 0
+  , Zombie Basic (1020, 50) 0 0
+  ] 
+
+
 zombieLvl3 :: [Zombie]
 zombieLvl3 = 
   [ Zombie Basic (620, 250) 0 0  
@@ -196,7 +207,7 @@ level1 = Universe
 
 level2 :: Universe
 level2 = Universe
-                sampleZombies
+                zombieLvl2
                 []
                 (initCards [PeasShooter, Sunflower] (-570,  256.5))
                 ([], uFrequency)

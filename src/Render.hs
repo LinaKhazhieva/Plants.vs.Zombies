@@ -58,21 +58,12 @@ drawCard m card
     (x, y)     = cCoords card
 
 drawMoney :: Int -> Picture
-drawMoney m = Translate (-638) (227) pic
+drawMoney m = Translate (-650) (227) pic
   where
     pic = renderMoney m
 
-digits :: Int -> [Int]
-digits n = map (\x -> read [x] :: Int) (show n)
-
 renderMoney :: Int -> Picture
-renderMoney = numPicture -- m = moveDigits (map digitToPic (digits m))
-
-moveDigits :: [Picture] -> Picture
-moveDigits []       = blank
-moveDigits (d : ds) = Translate x 0 d <> moveDigits ds
-  where
-    x = -12 * fromIntegral (length ds)
+renderMoney = numPicture 
 
 renderMenuButton :: Picture
 renderMenuButton = Translate 600 260 menuButton

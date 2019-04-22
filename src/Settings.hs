@@ -89,7 +89,7 @@ cellCoords =
 --   has delta of 80, to render beautifully
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie Basic (620, 50) 0 0  
+  [ Zombie Basic (608, 50) 0 0  
   , Zombie Basic (740, 50) 0 0
   , Zombie Basic (850, 50) 0 0
   , Zombie Basic (975, 50) 0 0
@@ -113,7 +113,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State level1 [level2]
+initState = State [] False None level1 [level2]
 
 -- | Starter universe
 level1 :: Universe
@@ -121,8 +121,7 @@ level1 = Universe
                sampleZombies
                []
                cards
-               ([], uFrequency)
-               (newScreen 1 4)
+               ([], uFrequency) 
                False
                0
                150
@@ -134,8 +133,7 @@ level2 = Universe
                 sampleZombies
                 []
                 (initCards [PeasShooter, Sunflower] (-570,  256.5))
-                ([], uFrequency)
-                blank
+                ([], uFrequency) 
                 False
                 0
                 50

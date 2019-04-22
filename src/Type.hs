@@ -6,9 +6,11 @@ import           Structure.Object
 
 -- | Type for coordinates on the field
 type Coords = (Float, Float)
+type UserName = [Char]
 
 -- | Data type to store different types of zombie
 data ZombieType = Basic | Buckethead
+  deriving (Show, Read)
 
 -- | Data type for Zombie
 data Zombie = Zombie
@@ -17,6 +19,7 @@ data Zombie = Zombie
   , zDamage  :: Int        -- ^ damage the zombie received
   , zSeconds :: Float      -- ^ seconds tha is left till zombie bite
   }
+  deriving (Show, Read)
 
 -- | Accessor for the speed of the zombies
 zSpeed :: ZombieType -> Float
@@ -44,6 +47,7 @@ data Card = Card
   , cCoords   :: Coords    -- ^ Card coordinates
   , cTime     :: Float
   }
+  deriving (Show, Read)
 
 cPicture :: PlantType -> Picture
 cPicture PeasShooter = peasshooterCard
@@ -59,7 +63,7 @@ cFrequency Sunflower   = 5
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower
-  deriving (Eq)
+  deriving (Eq, Show, Read)
 
 -- | Data type for Plants
 data Plant = Plant
@@ -69,15 +73,17 @@ data Plant = Plant
   , pBullet  :: [Projectile] -- ^ peas of the plant
   , pSeconds :: Float        -- ^ seconds that is left till the plant shoots
   }
+  deriving (Show, Read)
 
 data ProjectileType = Sun | Pea
-  deriving (Eq)
+  deriving (Eq, Show, Read)
 
 -- | Data type for projectile of the other plant
 data Projectile = Projectile
   { prType   :: ProjectileType
   , prCoords :: Coords          -- ^ coordinates of projectile
   }
+  deriving (Show, Read)
 
 -- | Accessor for the plant
 pHealth :: PlantType -> Int
@@ -106,40 +112,37 @@ prPicture :: ProjectileType -> Picture
 prPicture Sun = sun
 prPicture Pea = projectile
 
-digitToPic :: Int -> Picture
-digitToPic 0 = zero
-digitToPic 1 = one
-digitToPic 2 = two
-digitToPic 3 = three
-digitToPic 4 = four
-digitToPic 5 = five
-digitToPic 6 = six
-digitToPic 7 = seven
-digitToPic 8 = eight
-digitToPic 9 = nine
-digitToPic _ = blank
-
 -- | Data type for whole Universe
 data Universe = Universe
   { uEnemies  :: [Zombie]              -- ^ predefined wave
   , uDefense  :: [Plant]               -- ^ list of plants that player put
   , uCards    :: [Card]                -- ^ cards of plants to plant
   , uSuns     :: ([Projectile], Float) -- ^ suns falling from the sky,
-                                         -- with time left to create the sun
-  , uScreen   :: Picture               -- ^ special screen to denote
-                                         -- the game over
+                                         -- with time left to create the sun 
   , uOver     :: Bool                  -- ^ denotes if the game is over
   , uTime     :: Float                 -- ^ amount of time passed since start
   , uMoney    :: Int
   , uLevelNum :: Int
   , uStage    :: Int
   }
+  deriving (Show, Read)
 
 newScreen :: Int -> Int -> Picture
 newScreen _ 1 = sunflowerCard
 newScreen _ 2 = levelOne
-newScreen _ 3 = menu
-newScreen _ 4 = menu <> user <> strPicture "hello world!11"
+newScreen _ 3 = menu 
+newScreen _ 4 = menu <> user 
 newScreen _ _ = blank
 
-data State = State Universe [Universe]
+-- | TODO: change to bool
+data EditType = Rename | None | OK
+  deriving (Eq, Show, Read)
+
+data State = State
+  { sName     :: UserName
+  , sChecked  :: Bool
+  , sEdit     :: EditType
+  , sUniverse :: Universe
+  , sLevels   :: [Universe]
+  }
+  deriving (Show, Read)

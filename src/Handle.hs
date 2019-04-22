@@ -8,19 +8,27 @@ import Settings
 import Data.Maybe
 import Data.List
 import Utils
+import Structure.Alphabet
+import Structure.Object
+import           Graphics.Gloss
+import Save
 
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
-handleCoords mouseCoords (State u [])
-  | isWon u && uStage u == 1   = State (handleNextScreen u) []
-  | not (isWon u)              = State (handleProcess mouseCoords u) []
-  | otherwise                  = State u []
-handleCoords mouseCoords (State u (next:us))
-  | isWon u && uStage u == 1   = State (handleNextScreen u) (next:us)
-  | isWon u && uStage u == 2   = State next us
-  | not (isWon u)              = State (handleProcess mouseCoords u) (next:us)
-  | otherwise                  = State u (next:us)              
+handleCoords mc (State _n _c _t u [])
+  | isWon u && uStage u == 1   = State _n _c _t (handleNextScreen u) []
+  | uStage u == 3              = State _n _c _t (startGame mc u) []
+  | uStage u == 4              = checkField mc (State _n _c _t u [])
+  | not (isWon u)              = State _n _c _t (handleProcess mc u) []
+  | otherwise                  = State _n _c _t u []
+handleCoords mc (State _n _c _t u (next:us))
+  | isWon u && uStage u == 1   = State _n _c _t (handleNextScreen u) (next:us)
+  | isWon u && uStage u == 2   = State _n _c _t next us
+  | uStage u == 3              = State _n _c _t (startGame mc u) (next:us)
+  | uStage u == 4              = checkField mc (State _n _c _t u (next:us))
+  | not (isWon u)              = State _n _c _t (handleProcess mc u) (next:us)
+  | otherwise                  = State _n _c _t u (next:us)              
  
 
 handleProcess :: Coords -> Universe -> Universe
@@ -31,9 +39,7 @@ handleProcess mc u = changeScreen
                                   then newU
                                   else handleU
     newU                      = u
-                    { uScreen = newScreen (uLevelNum u) 3
-                    , uStage  = 3
-                    }
+                    { uStage  = 3 }
     handleU                   = u
                    { uDefense = newDefense
                    , uCards   = newCards
@@ -49,9 +55,7 @@ handleProcess mc u = changeScreen
 
 handleNextScreen :: Universe -> Universe
 handleNextScreen u = u
-         { uScreen = newScreen (uLevelNum u) 2
-         , uStage  = 2
-         }
+         { uStage  = 2 }
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
@@ -237,3 +241,63 @@ invertCardActive :: Card -> Card
 invertCardActive card = card { isActive = not active }
   where
     active = isActive card
+
+
+handleMenu :: Char -> State -> State
+handleMenu c s = if length (sName s) > 10
+                    then s
+                    else s { sName = ((sName s) ++ [c]) }
+
+deleteChar :: State -> State
+deleteChar s = change name
+  where
+    name = uncons (reverse (sName s))
+    change n = 
+      case n of
+        Nothing          -> s
+        Just (_h, chars) -> s { sName = reverse chars }
+
+-- | TODO: REFACTOR!!!!!!
+checkField :: Coords -> State -> State
+checkField mc s = upd s
+  where
+    upd = check . deleteS . renameS . goBack
+    renameS s = if checkMouse mc (-136, -160) 248 40 && (sChecked s)
+                  then s { sEdit = Rename }
+                  else s
+    deleteS s = if checkMouse mc (135, -160) 248 40 && (sChecked s)
+                   then s { sEdit     = None
+                          , sName     = []
+                          , sChecked  = False
+                          }
+                   else s
+    check s = if checkMouse mc (0, 85) 454 39 && not (sChecked s)
+                 then s { sChecked  = not (sChecked s)
+                        --, sUniverse =  newU
+                        }
+
+                 else s
+    goBack s = if checkMouse mc (-136, -207) 248 40 && (length (sName s) /= 0)
+                then s { sChecked  = False
+                       , sEdit     = None
+                       , sUniverse = updU
+                       }
+                else s
+    updU = u
+      { uStage  = 3 }    
+    u    = sUniverse s
+
+startGame :: Coords -> Universe -> Universe
+startGame mc u = upd u
+  where
+    upd = startGame . changeName
+    startGame u = if checkMouse mc (-275, 55) 250 110
+                    then newU
+                    else u
+    changeName u = if checkMouse mc (-574, 170) 212 40
+                    then changeMenu
+                    else u
+    changeMenu = u
+              { uStage  = 4 }
+    newU = u
+      { uStage  = 0 }

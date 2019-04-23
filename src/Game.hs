@@ -12,6 +12,7 @@ import Utils
 import Update
 import Handle
 import Save
+import System.Exit
 
 -- | Function to render universe
 drawState :: State -> Picture
@@ -47,11 +48,11 @@ handleState :: Event -> State -> State
 handleState (EventKey (MouseButton LeftButton)
                Down _ mouseCoords) s = handleCoords mouseCoords s
 handleState (EventKey (Char c) Down _ _)
-            s = if (sChecked s) && sEdit s == Rename 
+            s = if sEdit s == Rename 
                   then handleMenu c s
                   else s
 handleState (EventKey (SpecialKey KeyDelete)
-            Down _ _) s = if (sChecked s) && sEdit s == Rename
+            Down _ _) s = if sEdit s == Rename
                             then deleteChar s
                             else s
 handleState _  s = s
@@ -87,20 +88,16 @@ drawStateIO s = return (drawState s)
 
 handleStateIO :: Event -> State -> IO State
 handleStateIO (EventKey (SpecialKey KeyF2) Down _ _) s = saveState s
-handleStateIO (EventKey (Char c) Down _ _) s = do 
-                                                  let s = handleState e s
-                                                  writeFile "save/userName.txt" (sName s)
-                                                  return s 
-handleStateIO e s = return . handleState e s
+handleStateIO (EventKey (MouseButton LeftButton)
+               Down _ mouseCoords) s = if uStage (sUniverse s) == 4
+                                          then checkField mouseCoords s
+                                          else return $ handleCoords mouseCoords s
+handleStateIO (EventKey (SpecialKey KeyEsc) Down _ _) s = do _ <- saveState s
+                                                             exitSuccess
+handleStateIO e s = return $ handleState e s
 
 updateStateIO :: Float -> State -> IO State
 updateStateIO dt = return . updateState dt
-
-saveState :: State -> IO State
-saveState s = do
-  let path = "save/" ++ sName s ++ ".txt"
-  writeFile path $ show s
-  return s
 
 game :: String -> IO ()
 game name = play screen bgColor fps

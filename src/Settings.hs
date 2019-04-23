@@ -113,7 +113,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State [] False None level1 [level2]
+initState = State [] None level1 [level2]
 
 -- | Starter universe
 level1 :: Universe

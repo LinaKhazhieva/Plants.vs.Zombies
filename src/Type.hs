@@ -139,8 +139,7 @@ data EditType = Rename | None | OK
   deriving (Eq, Show, Read)
 
 data State = State
-  { sName     :: UserName
-  , sChecked  :: Bool
+  { sName     :: UserName 
   , sEdit     :: EditType
   , sUniverse :: Universe
   , sLevels   :: [Universe]

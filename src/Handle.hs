@@ -12,23 +12,22 @@ import Structure.Alphabet
 import Structure.Object
 import           Graphics.Gloss
 import Save
+import System.Directory
 
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
-handleCoords mc (State _n _c _t u [])
-  | isWon u && uStage u == 1   = State _n _c _t (handleNextScreen u) []
-  | uStage u == 3              = State _n _c _t (startGame mc u) []
-  | uStage u == 4              = checkField mc (State _n _c _t u [])
-  | not (isWon u)              = State _n _c _t (handleProcess mc u) []
-  | otherwise                  = State _n _c _t u []
-handleCoords mc (State _n _c _t u (next:us))
-  | isWon u && uStage u == 1   = State _n _c _t (handleNextScreen u) (next:us)
-  | isWon u && uStage u == 2   = State _n _c _t next us
-  | uStage u == 3              = State _n _c _t (startGame mc u) (next:us)
-  | uStage u == 4              = checkField mc (State _n _c _t u (next:us))
-  | not (isWon u)              = State _n _c _t (handleProcess mc u) (next:us)
-  | otherwise                  = State _n _c _t u (next:us)              
+handleCoords mc (State _n _t u [])
+  | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) []
+  | uStage u == 3              = State _n _t (startGame mc u) [] 
+  | not (isWon u)              = State _n _t (handleProcess mc u) []
+  | otherwise                  = State _n _t u []
+handleCoords mc (State _n _t u (next:us))
+  | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) (next:us)
+  | isWon u && uStage u == 2   = State _n _t next us
+  | uStage u == 3              = State _n _t (startGame mc u) (next:us)
+  | not (isWon u)              = State _n _t (handleProcess mc u) (next:us)
+  | otherwise                  = State _n _t u (next:us)              
  
 
 handleProcess :: Coords -> Universe -> Universe
@@ -258,34 +257,42 @@ deleteChar s = change name
         Just (_h, chars) -> s { sName = reverse chars }
 
 -- | TODO: REFACTOR!!!!!!
-checkField :: Coords -> State -> State
-checkField mc s = upd s
+checkField :: Coords -> State -> IO State
+checkField mc s = upd
   where
-    upd = check . deleteS . renameS . goBack
-    renameS s = if checkMouse mc (-136, -160) 248 40 && (sChecked s)
-                  then s { sEdit = Rename }
-                  else s
-    deleteS s = if checkMouse mc (135, -160) 248 40 && (sChecked s)
-                   then s { sEdit     = None
-                          , sName     = []
-                          , sChecked  = False
-                          }
-                   else s
-    check s = if checkMouse mc (0, 85) 454 39 && not (sChecked s)
-                 then s { sChecked  = not (sChecked s)
-                        --, sUniverse =  newU
-                        }
-
-                 else s
-    goBack s = if checkMouse mc (-136, -207) 248 40 && (length (sName s) /= 0)
-                then s { sChecked  = False
-                       , sEdit     = None
-                       , sUniverse = updU
-                       }
-                else s
-    updU = u
-      { uStage  = 3 }    
-    u    = sUniverse s
+    isRename = checkMouse mc (-136, -160) 248 40
+    isDelete = checkMouse mc (135, -160) 248 40
+    isOK     = checkMouse mc (-136, -207) 248 40 && (length (sName s) /= 0)
+    isCancel = checkMouse mc (135, -227) 248 40
+    upd = case () of _
+                      | isRename  -> return $ s { sEdit = Rename }
+                      | isDelete  -> return $ initState { sUniverse = (sUniverse initState) { uStage = 4 } } 
+                      | isOK      -> saveName
+                      | isCancel  -> cancelEdit
+                      | otherwise -> return $ s
+      where
+        goBack = s { sEdit     = None
+                   , sUniverse = u { uStage = 3 }
+                   }   
+        u    = sUniverse s
+        saveName = do let path = "save/" ++ sName s ++ ".txt"
+                      name <- readFile "save/userName.txt"
+                      case () of _
+                                  | length name == 0 -> do writeFile "save/userName.txt" (sName s)
+                                                           saveState goBack
+                                  | name == sName s  -> do saveState goBack
+                                  | otherwise        -> do writeFile "save/userName.txt" (sName s)
+                                                           let path = "save/" ++ sName s ++ ".txt"
+                                                           let path2 = "save/" ++ name ++ ".txt"
+                                                           renameFile path2 path
+                                                           saveState $ s { sUniverse = u { uStage = 3}}
+        cancelEdit = do name <- readFile "save/userName.txt"
+                        case length name of
+                          0 -> return s
+                          _ -> do let path = "save/" ++ name ++ ".txt"
+                                  strState <- readFile path
+                                  let st    = read $ strState
+                                  return st { sUniverse = (sUniverse st) { uStage = 3 } }
 
 startGame :: Coords -> Universe -> Universe
 startGame mc u = upd u
@@ -301,3 +308,9 @@ startGame mc u = upd u
               { uStage  = 4 }
     newU = u
       { uStage  = 0 }
+
+saveState :: State -> IO State
+saveState s = do
+  let path = "save/" ++ sName s ++ ".txt"
+  writeFile path $ show s
+  return s

@@ -3,28 +3,26 @@
 
 module Handle where
 
-import Type
-import Settings
-import Data.Maybe
-import Data.List
-import Utils
-import Structure.Alphabet
-import Structure.Object
-import           Graphics.Gloss
-import Save
-import System.Directory
+import           Type
+import           Settings
+import           Data.Maybe
+import           Data.List
+import           Utils
+import           System.Directory
 
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
 handleCoords mc (State _n _t u [])
   | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) []
+  | isLost u && uStage u == 0  = State _n _t (getLevel (uLevelNum u)) []
   | uStage u == 3              = State _n _t (startGame mc u) [] 
   | not (isWon u)              = State _n _t (handleProcess mc u) []
   | otherwise                  = State _n _t u []
 handleCoords mc (State _n _t u (next:us))
   | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) (next:us)
   | isWon u && uStage u == 2   = State _n _t next us
+  | isLost u && uStage u == 0  = State _n _t (getLevel (uLevelNum u)) (next:us)
   | uStage u == 3              = State _n _t (startGame mc u) (next:us)
   | not (isWon u)              = State _n _t (handleProcess mc u) (next:us)
   | otherwise                  = State _n _t u (next:us)              
@@ -185,10 +183,10 @@ removeSun mc ss = newBullet
         Just index -> some index
         Nothing    -> ss
       where
-        some i        = filter predicate (fst (splitSuns i)) 
-                     ++ snd (splitSuns i)
-        splitSuns i   = splitAt (i + 1) ss
-        predicate sun = not (checkMouse mc (prCoords sun) 88.5 88.5)
+        some i      = filter predicate (fst (splitSuns i)) 
+                    ++ snd (splitSuns i)
+        splitSuns i = splitAt (i + 1) ss
+        predicate s = not (checkMouse mc (prCoords s) 88.5 88.5)
 
 -- | Function to divide list of plants by the plant types.
 --   Creates two list: sunflowers, other type of plants
@@ -256,7 +254,6 @@ deleteChar s = change name
         Nothing          -> s
         Just (_h, chars) -> s { sName = reverse chars }
 
--- | TODO: REFACTOR!!!!!!
 checkField :: Coords -> State -> IO State
 checkField mc s = upd
   where
@@ -267,47 +264,51 @@ checkField mc s = upd
     upd = case () of _
                       | isRename  -> return $ s { sEdit = Rename }
                       | isDelete  -> return $ initState { sUniverse = (sUniverse initState) { uStage = 4 } } 
-                      | isOK      -> saveName
-                      | isCancel  -> cancelEdit
+                      | isOK      -> saveName s
+                      | isCancel  -> cancelEdit s
                       | otherwise -> return $ s
-      where
-        goBack = s { sEdit     = None
-                   , sUniverse = u { uStage = 3 }
-                   }   
-        u    = sUniverse s
-        saveName = do let path = "save/" ++ sName s ++ ".txt"
-                      name <- readFile "save/userName.txt"
-                      case () of _
-                                  | length name == 0 -> do writeFile "save/userName.txt" (sName s)
-                                                           saveState goBack
-                                  | name == sName s  -> do saveState goBack
-                                  | otherwise        -> do writeFile "save/userName.txt" (sName s)
-                                                           let path = "save/" ++ sName s ++ ".txt"
-                                                           let path2 = "save/" ++ name ++ ".txt"
-                                                           renameFile path2 path
-                                                           saveState $ s { sUniverse = u { uStage = 3}}
-        cancelEdit = do name <- readFile "save/userName.txt"
-                        case length name of
-                          0 -> return s
-                          _ -> do let path = "save/" ++ name ++ ".txt"
-                                  strState <- readFile path
-                                  let st    = read $ strState
-                                  return st { sUniverse = (sUniverse st) { uStage = 3 } }
+        
+
+cancelEdit :: State -> IO State
+cancelEdit s = do name <- readFile "save/userName.txt"
+                  case length name of
+                    0 -> return s
+                    _ -> loadSaving name
+  where
+    loadSaving n = do let path = "save/" ++ n ++ ".txt"
+                      strState <- readFile path
+                      let st    = read $ strState
+                      return st { sUniverse = (sUniverse st) { uStage = 3 } }
+
+
+saveName :: State -> IO State
+saveName s = do name <- readFile "save/userName.txt"
+                case () of _
+                            | length name == 0 -> createUser
+                            | name == sName s  -> saveState goBack
+                            | otherwise        -> changeName name
+  where
+    createUser   = do writeFile "save/userName.txt" (sName s)
+                      saveState goBack
+    changeName n = do writeFile "save/userName.txt" (sName s)
+                      let path = "save/" ++ sName s ++ ".txt" 
+                      let path2 = "save/" ++ n ++ ".txt"
+                      renameFile path2 path
+                      saveState $ s { sUniverse = u { uStage = 3}}
+    goBack       = s { sEdit     = None
+                     , sUniverse = u { uStage = 3 }
+                     }
+    u            = sUniverse s 
 
 startGame :: Coords -> Universe -> Universe
-startGame mc u = upd u
+startGame mc u = upd
   where
-    upd = startGame . changeName
-    startGame u = if checkMouse mc (-275, 55) 250 110
-                    then newU
-                    else u
-    changeName u = if checkMouse mc (-574, 170) 212 40
-                    then changeMenu
-                    else u
-    changeMenu = u
-              { uStage  = 4 }
-    newU = u
-      { uStage  = 0 }
+    isStart = checkMouse mc (-275, 55) 250 110
+    isEdit  = checkMouse mc (-574, 170) 212 40
+    upd     = case () of _
+                          | isStart   -> u { uStage = 0 }
+                          | isEdit    -> u { uStage = 4 } 
+                          | otherwise -> u
 
 saveState :: State -> IO State
 saveState s = do

@@ -140,3 +140,6 @@ level2 = Universe
                 2
                 0
 
+getLevel :: Int -> Universe
+getLevel 1 = level1 { uStage = 0 }
+getLevel _ = level2

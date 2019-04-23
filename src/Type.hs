@@ -134,6 +134,8 @@ newScreen _ 3 = menu
 newScreen _ 4 = menu <> user 
 newScreen _ _ = blank
 
+
+
 -- | TODO: change to bool
 data EditType = Rename | None | OK
   deriving (Eq, Show, Read)

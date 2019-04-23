@@ -11,7 +11,6 @@ import Settings
 import Utils
 import Update
 import Handle
-import Save
 import System.Exit
 import System.Directory
 
@@ -122,12 +121,12 @@ gameIO s = playIO screen bgColor fps
 
 perform :: IO()
 perform = do
-            let path = "save/userName.txt"
-            isExist <- doesFileExist path
+            let fileName = "save/userName.txt"
+            isExist <- doesFileExist fileName
             if not isExist
-              then writeFile path ""       
+              then writeFile fileName ""       
               else return ()
-            name <- readFile path
+            name <- readFile fileName
             case (length name) of
               0 -> gameIO $ initState 
               _ -> do

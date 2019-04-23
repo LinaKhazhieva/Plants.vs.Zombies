@@ -13,6 +13,7 @@ import Update
 import Handle
 import Save
 import System.Exit
+import System.Directory
 
 -- | Function to render universe
 drawState :: State -> Picture
@@ -121,7 +122,12 @@ gameIO s = playIO screen bgColor fps
 
 perform :: IO()
 perform = do
-            name <- readFile "save/userName.txt"
+            let path = "save/userName.txt"
+            isExist <- doesFileExist path
+            if not isExist
+              then writeFile path ""       
+              else return ()
+            name <- readFile path
             case (length name) of
               0 -> gameIO $ initState 
               _ -> do

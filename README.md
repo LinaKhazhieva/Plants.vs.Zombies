@@ -1,4 +1,6 @@
-![](assets/logo.jpg)
+<p align="center">
+  <img src="https://github.com/LinaChasova/Plants.vs.Zombies/blob/master/assets/logo.jpg" width="200" height="160"/>
+</p>
 
 # Plants vs. Zombies in Haskell
 
@@ -6,13 +8,17 @@
 
 Haskell project 2019 spring Innopolis University.
 
-![](assets/fight.gif)
+<p align="center">
+  <img src="https://github.com/LinaChasova/Plants.vs.Zombies/blob/master/assets/fight.gif"/>
+</p>
 
 ### Members
 * Kamilla Borodina
 * Alina Chasova
 
-![](assets/name.gif)
+<p align="center">
+  <img src="https://github.com/LinaChasova/Plants.vs.Zombies/blob/master/assets/name.gif"/>
+</p>
 
 ### Prerequisites
 

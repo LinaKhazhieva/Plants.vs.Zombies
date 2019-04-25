@@ -17,6 +17,15 @@ import System.Exit
 import System.Directory
 
 -- | Function to render universe
+-- * if in menu screen    -> draws menu with the username
+-- * if player edits name -> draws menu with the window
+--                           to edit name
+-- * if screen is between -> draw corresponding the the
+--   new card and next       level and stage of the game
+--   level                   picture
+-- * if player won        -> draw new card
+-- * if player lost       -> draw lose screen
+-- * if in the game       -> draw field
 drawState :: State -> Picture
 drawState s
   | uStage u == Menu      = newScreen (uLevelNum u) Menu 
@@ -27,8 +36,6 @@ drawState s
                          <> Translate (-595) 216.5
                             (scale 0.7 0.7 (strPicture (sName s))) 
   | uStage u == NextLevel = pic <> newScreen (uLevelNum u) NextLevel
-  | isWon u 
-    && uStage u == Game   = pic <> newScreen (uLevelNum u) Game
   | uStage u == NewCard   = pic <> newScreen (uLevelNum u) NewCard
   | isLost u 
     && uStage u == Game   = pic <> lost
@@ -48,6 +55,11 @@ drawState s
 
 -- | Function to change universe according
 --   to its rules by the interaction with the player
+-- * if player clicked with mouse -> handle depending on the
+--                                   coords
+-- * if player used keyboard      -> changes name, if in edit state
+-- * if player used backdpace but -> changed name, if in edit state
+-- * other interaction            -> leaves unchanged
 handleState :: Event -> State -> State
 handleState (EventKey (MouseButton LeftButton)
                Down _ mouseCoords) s       = handleCoords mouseCoords s
@@ -63,6 +75,12 @@ handleState _  s = s
 -- | Function to change universe according
 --   to its rules by the time passed
 --   detect if the game is over
+-- * if player won    -> change stage of the game to
+--                       display new card opened to player
+-- * if lost          -> leave state unchanged
+-- * if still playing -> update universe fields based on
+--                       rules defined in universe
+-- * else             -> leaves unchanges
 updateState :: Float -> State -> State
 updateState dt s
   | isWon u 
@@ -88,9 +106,19 @@ updateState dt s
         , uTime    = newTime
         }
 
+-- | Function used, because savings of the game
+--   are performed. As nothing unpure happens
+--   within drawStateIO, just calls drawState
 drawStateIO :: State -> IO Picture
-drawStateIO s = return (drawState s)
+drawStateIO = return . drawState
 
+-- | Function to perfrom savings. As savings is
+--   not unpure, uses IO.
+-- * if pressed F2    -> save game
+-- * if mouse clicked and in the stage
+--    of editing name -> perform needed editing
+-- * if pressed Esc -> save game and exit
+-- * else -> call handleState
 handleStateIO :: Event -> State -> IO State
 handleStateIO (EventKey (SpecialKey KeyF2)
                Down _ _) s  = saveState s
@@ -106,16 +134,6 @@ handleStateIO e s            = return $ handleState e s
 
 updateStateIO :: Float -> State -> IO State
 updateStateIO dt = return . updateState dt
-
-game :: String -> IO ()
-game name = play screen bgColor fps
-  initState { sName = name }
-  drawState
-  handleState
-  updateState 
-  where
-    bgColor = white
-    fps = 60
 
 gameIO :: State -> IO ()
 gameIO s = playIO screen bgColor fps

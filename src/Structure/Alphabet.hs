@@ -5,6 +5,7 @@ module Structure.Alphabet where
 import           Data.Maybe
 import           Graphics.Gloss
 import           System.IO.Unsafe (unsafePerformIO)
+
 -- | Function to load a picture from given path 
 loadPicture :: String -> Picture
 loadPicture path = unsafePerformIO $ loadBMP path

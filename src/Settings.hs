@@ -89,7 +89,7 @@ cellCoords =
 --   has delta of 80, to render beautifully
 sampleZombies :: [Zombie]
 sampleZombies = 
-  [ Zombie Basic (620, 50) 0 0  
+  [ Zombie Basic (608, 50) 0 0  
   , Zombie Basic (740, 50) 0 0
   , Zombie Basic (850, 50) 0 0
   , Zombie Basic (975, 50) 0 0
@@ -170,11 +170,7 @@ zombieLvl5 =
 -- | Predefined defense structure
 samplePlants :: [Plant]
 samplePlants =
-  [-- Plant PeasShooter (-408,  70) 0 [] 0
-  -- , Plant PeasShooter (-408, -30) 0 [] 0
- -- , Plant PeasShooter (-408, -130) 0 [] 0
---  , Plant Sunflower   (-330, 100)  0 [] 4
-  ]
+  []
  
 cards :: [Card]
 cards = initCards [PeasShooter] (-570,  256.5)
@@ -189,7 +185,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State level1 [level2, level3, level4, level5 ]
+initState = State [] None level1 [level2, level3, level4, level5 ]
 
 -- | Starter universe
 level1 :: Universe
@@ -197,21 +193,19 @@ level1 = Universe
                sampleZombies
                []
                cards
-               ([], uFrequency)
-               blank
+               ([], uFrequency) 
                False
                0
                150
                1
-               0
+               4
 
 level2 :: Universe
 level2 = Universe
                 zombieLvl2
                 []
                 (initCards [PeasShooter, Sunflower] (-570,  256.5))
-                ([], uFrequency)
-                blank
+                ([], uFrequency) 
                 False
                 0
                 50
@@ -259,3 +253,10 @@ level5 = Universe
                 0
 
 
+getLevel :: Int -> Universe
+getLevel 1 = level1 { uStage = 0 }
+getLevel 2 = level2
+getLevel 3 = level3
+getLevel 4 = level4
+getLevel 5 = level5
+getLevel _ = level5

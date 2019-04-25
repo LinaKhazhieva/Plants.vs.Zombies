@@ -4,34 +4,47 @@
 
 module Handle where
 
-import Type
-import Settings
-import Data.Maybe
-import Data.List
-import Utils
+import           Type
+import           Settings
+import           Data.Maybe
+import           Data.List
+import           Utils
+import           System.Directory
 
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
-handleCoords mouseCoords (State u [])
-  | isWon u && uStage u == 1   = State (handleNextScreen u) []
-  | not (isWon u)              = State (handleProcess mouseCoords u) []
-  | otherwise                  = State u []
-handleCoords mouseCoords (State u (next:us))
-  | isWon u && uStage u == 1   = State (handleNextScreen u) (next:us)
-  | isWon u && uStage u == 2   = State next us
-  | not (isWon u)              = State (handleProcess mouseCoords u) (next:us)
-  | otherwise                  = State u (next:us)              
+handleCoords mc (State _n _t u [])
+  | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) []
+  | isLost u && uStage u == 0  = State _n _t (getLevel (uLevelNum u)) []
+  | uStage u == 3              = State _n _t (startGame mc u) [] 
+  | not (isWon u)              = State _n _t (handleProcess mc u) []
+  | otherwise                  = State _n _t u []
+handleCoords mc (State _n _t u (next:us))
+  | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) (next:us)
+  | isWon u && uStage u == 2   = State _n _t next us
+  | isLost u && uStage u == 0  = State _n _t (getLevel (uLevelNum u)) (next:us)
+  | uStage u == 3              = State _n _t (startGame mc u) (next:us)
+  | not (isWon u)              = State _n _t (handleProcess mc u) (next:us)
+  | otherwise                  = State _n _t u (next:us)              
  
 
 handleProcess :: Coords -> Universe -> Universe
-handleProcess mc u = u
-        { uDefense = newDefense
-        , uCards   = newCards
-        , uSuns    = newSuns
-        , uMoney   = updMoney
-        }
+handleProcess mc u = changeScreen
   where
+    isButton                  = checkMouse mc (600, 260) 175 70
+    changeScreen              = if isButton
+                                  then newU
+                                  else handleU
+    newU                      = u
+                    { uStage  = 3 }
+    handleU                   = u
+                   { uDefense = newDefense
+                   , uCards   = newCards
+                   , uSuns    = newSuns
+                   , uMoney   = updMoney
+                   }
+
     (newDefense, updCs, newM) = handlePlants mc u
     newCards                  = handleCards mc u updCs
     (newSuns, updMoney)       = if newM == uMoney u
@@ -40,9 +53,7 @@ handleProcess mc u = u
 
 handleNextScreen :: Universe -> Universe
 handleNextScreen u = u
-         { uScreen = newScreen (uLevelNum u) 2
-         , uStage  = 2
-         }
+         { uStage  = 2 }
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
@@ -173,10 +184,10 @@ removeSun mc ss = newBullet
         Just index -> some index
         Nothing    -> ss
       where
-        some i        = filter predicate (fst (splitSuns i)) 
-                     ++ snd (splitSuns i)
-        splitSuns i   = splitAt (i + 1) ss
-        predicate sun = not (checkMouse mc (prCoords sun) 88.5 88.5)
+        some i      = filter predicate (fst (splitSuns i)) 
+                    ++ snd (splitSuns i)
+        splitSuns i = splitAt (i + 1) ss
+        predicate s = not (checkMouse mc (prCoords s) 88.5 88.5)
 
 -- | Function to divide list of plants by the plant types.
 --   Creates two list: sunflowers, other type of plants
@@ -228,3 +239,80 @@ invertCardActive :: Card -> Card
 invertCardActive card = card { isActive = not active }
   where
     active = isActive card
+
+
+handleMenu :: Char -> State -> State
+handleMenu c s = if length (sName s) > 10
+                    then s
+                    else s { sName = ((sName s) ++ [c]) }
+
+deleteChar :: State -> State
+deleteChar s = change name
+  where
+    name = uncons (reverse (sName s))
+    change n = 
+      case n of
+        Nothing          -> s
+        Just (_h, chars) -> s { sName = reverse chars }
+
+checkField :: Coords -> State -> IO State
+checkField mc s = upd
+  where
+    isRename = checkMouse mc (-136, -160) 248 40
+    isDelete = checkMouse mc (135, -160) 248 40
+    isOK     = checkMouse mc (-136, -207) 248 40 && (length (sName s) /= 0)
+    isCancel = checkMouse mc (135, -227) 248 40
+    upd = case () of _
+                      | isRename  -> return $ s { sEdit = Rename }
+                      | isDelete  -> return $ initState { sUniverse = (sUniverse initState) { uStage = 4 } } 
+                      | isOK      -> saveName s
+                      | isCancel  -> cancelEdit s
+                      | otherwise -> return $ s
+        
+
+cancelEdit :: State -> IO State
+cancelEdit s = do name <- readFile "save/userName.txt"
+                  case length name of
+                    0 -> return s
+                    _ -> loadSaving name
+  where
+    loadSaving n = do let path = "save/" ++ n ++ ".txt"
+                      strState <- readFile path
+                      let st    = read $ strState
+                      return st { sUniverse = (sUniverse st) { uStage = 3 } }
+
+
+saveName :: State -> IO State
+saveName s = do name <- readFile "save/userName.txt"
+                case () of _
+                            | length name == 0 -> createUser
+                            | name == sName s  -> saveState goBack
+                            | otherwise        -> changeName name
+  where
+    createUser   = do writeFile "save/userName.txt" (sName s)
+                      saveState goBack
+    changeName n = do writeFile "save/userName.txt" (sName s)
+                      let path = "save/" ++ sName s ++ ".txt" 
+                      let path2 = "save/" ++ n ++ ".txt"
+                      renameFile path2 path
+                      saveState $ s { sUniverse = u { uStage = 3}}
+    goBack       = s { sEdit     = None
+                     , sUniverse = u { uStage = 3 }
+                     }
+    u            = sUniverse s 
+
+startGame :: Coords -> Universe -> Universe
+startGame mc u = upd
+  where
+    isStart = checkMouse mc (-275, 55) 250 110
+    isEdit  = checkMouse mc (-574, 170) 212 40
+    upd     = case () of _
+                          | isStart   -> u { uStage = 0 }
+                          | isEdit    -> u { uStage = 4 } 
+                          | otherwise -> u
+
+saveState :: State -> IO State
+saveState s = do
+  let path = "save/" ++ sName s ++ ".txt"
+  writeFile path $ show s
+  return s

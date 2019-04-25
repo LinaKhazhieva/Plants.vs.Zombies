@@ -1,5 +1,6 @@
 .stack-work/
 images/assets
+save/*
 .DS_Store
 .ghci
 .travis.yml

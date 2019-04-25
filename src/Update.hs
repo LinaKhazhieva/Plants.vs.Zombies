@@ -30,12 +30,13 @@ collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
 -- zombie, if there's collision with the plant's 
 -- projectile.
 updateZombies :: Float -> State -> [Zombie]
-updateZombies dt (State u us) = update zs  
+updateZombies dt s = update zs  
   where
     update = map (updateZombie dt u)
            . deleteZombie
            . map (attackZombie dt u)
-    zs     = uEnemies u  
+    u      = sUniverse s
+    zs     = uEnemies u
 
 -- | Function to update one zombie in terms of moving zombie
 -- further or not. It checks the collision with the plants:
@@ -111,11 +112,12 @@ deleteZombie zs = filter (hasHealth) zs
 --   Shooting with the peas, if it seas the zombie.
 --   Move projectiles
 updatePlants :: Float -> State-> [Plant]
-updatePlants dt (State u us) = update ps                     
+updatePlants dt s = update ps                     
   where
     update = deletePlant
            . map (attackPlant dt u)
            . updateProjectiles dt u
+    u      = sUniverse s
     ps     = uDefense u
 
 -- | Function to lower health of plants
@@ -250,7 +252,7 @@ sendSun dt p
     oldSuns = pBullet p
 
 updateSuns :: Float -> State-> ([Projectile], Float)
-updateSuns dt (State u us)
+updateSuns dt s
   | seconds <= 0 = (send, uFrequency)
   | otherwise    = (ss, seconds)
   where
@@ -258,12 +260,14 @@ updateSuns dt (State u us)
     send    = newSun : ss
     newSun  = Projectile Sun (90, -25) 
     (ss, t) = uSuns u
+    u       = sUniverse s
 
 updateCards :: Float -> State -> [Card]
-updateCards dt (State u us)= update
+updateCards dt s = update
   where
     update = map (updateCard dt) cs
     cs     = uCards u
+    u      = sUniverse s
 
 updateCard :: Float -> Card -> Card
 updateCard dt c

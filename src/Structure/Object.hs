@@ -167,3 +167,9 @@ zombieNoteNextLvl = scale 0.5 0.5 pic
 screen :: Display
 screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)
 
+levelOne :: Picture
+levelOne = pic
+  where
+    pic = loadPicture "images/level1.bmp"
+
+

@@ -219,7 +219,6 @@ level3 = Universe
                 []
                 (initCards [PeasShooter, Sunflower] (-570,  256.5))
                 ([], uFrequency)
-                blank
                 False
                 0
                 50
@@ -232,7 +231,6 @@ level4 = Universe
                 []
                 (initCards [PeasShooter, Sunflower, Wallnut] (-570,  256.5))
                 ([], uFrequency)
-                blank
                 False
                 0
                 50
@@ -245,7 +243,6 @@ level5 = Universe
                 []
                 (initCards [PeasShooter, Sunflower, Wallnut] (-570,  256.5))
                 ([], uFrequency)
-                blank
                 False
                 0
                 50

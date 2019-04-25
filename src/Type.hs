@@ -92,7 +92,7 @@ data Projectile = Projectile
 pHealth :: PlantType -> Int
 pHealth PeasShooter = 300
 pHealth Sunflower   = 300
-pHealth Wallnut = 1200
+pHealth Wallnut = 4000
 
 -- | Accessor for the plant strength
 pStrength :: PlantType -> Int

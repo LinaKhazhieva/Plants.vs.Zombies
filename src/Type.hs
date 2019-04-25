@@ -3,7 +3,6 @@
 module Type where
 
 import           Graphics.Gloss
-import           Structure.Alphabet
 import           Structure.Object
 
 -- | Type for coordinates on the field

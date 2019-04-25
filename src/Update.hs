@@ -40,10 +40,11 @@ updateZombies dt s = update zs
     zs     = uEnemies u
 
 extract :: Float -> Universe -> [Zombie] -> [Zombie]
-extract dt u zs = concat $ map applyOne $ groupBy pred zs
+extract dt u zs = concat $ map applyOne $ groupBy predicate zs
   where
-    pred z1 z2 = zCoords z1 == zCoords z2
+    predicate z1 z2 = zCoords z1 == zCoords z2
     applyOne (z:xs) = attackZombie dt u z:xs
+    applyOne []     = []
 
 -- | Function to update one zombie in terms of moving zombie
 -- further or not. It checks the collision with the plants:
@@ -227,9 +228,9 @@ moveProjectile dt pr = Projectile Pea (x + dt * 250, y)
 -- * Delete if projectile moved out of the game border
 -- * Delete if projectile has collision with the zombie
 deleteProjectile :: Universe-> Plant -> Plant
-deleteProjectile u p = p { pBullet = delete prs }
+deleteProjectile u p = p { pBullet = deleted prs }
   where
-    delete          = filter (hasCollision)
+    deleted         = filter (hasCollision)
                     . filter (outOfBorder)
     prs             = pBullet p
     zs              = uEnemies u

@@ -42,11 +42,11 @@ sunflower :: Picture
 sunflower = pic
   where
     pic = loadPicture "images/sunflower.bmp"
+
 wallnut :: Picture
 wallnut = pic 
   where 
     pic = loadPicture "images/Wallnut.bmp"
-
 
 cardBlock :: Picture
 cardBlock = scale 0.5 0.5 pic
@@ -62,7 +62,6 @@ sunflowerCard :: Picture
 sunflowerCard = scale 0.52 0.52 pic
   where
     pic = loadPicture "images/sunflowercard.bmp"
-
 
 wallnutCard :: Picture
 wallnutCard= scale 0.52 0.52 pic
@@ -119,11 +118,6 @@ menuButton = pic
   where
     pic = loadPicture "images/menu_button.bmp"
 
-checkF :: Picture
-checkF = pic
-  where
-    pic = loadPicture "images/check.bmp"
-
 field :: Picture
 field = pic 
      <> Translate (-461.25) 256.5 cardBlock
@@ -156,13 +150,12 @@ zombieNote = scale 0.5 0.5  pic
 finalNote :: Picture 
 finalNote = scale 0.5 0.5  pic 
   where
-    pic = loadPicture "images/finalNote.bmp"    
+    pic = loadPicture "images/zombieFinalNote.bmp"    
 
 zombieNoteNextLvl :: Picture
 zombieNoteNextLvl = scale 0.5 0.5 pic 
   where 
     pic = loadPicture "images/zombieNoteNextLvl.bmp"
-
 
 screen :: Display
 screen = InWindow "Scene" (screenWidth, screenHeight) (10, 10)

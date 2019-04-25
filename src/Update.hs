@@ -17,39 +17,51 @@ attack
 attack _f [] b      = b
 attack f (x : xs) b = attack f xs (f x b)
 
+-- | Helping function to check if there is
+--   a collision between plant and zombie
 collisionPlantZombie :: Coords -> Coords -> Bool
 collisionPlantZombie (xs, ys) p = checkCollision cellWidth cellHeight
                                   cellWidth cellHeight (xs, ys - 80) p
 
+-- | Helping function to check if there is
+--   a collision between projectile and zombie
 collisionPeasZombie :: Coords -> Coords -> Bool
 collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
                                 cellWidth cellHeight pr (x, y - 80)
 
 -- | Function to perform updates on zombie, according
--- to time passed in the game. Move zombie, if there's
--- no collision with the plant, reduce health of the
--- zombie, if there's collision with the plant's 
--- projectile.
+--   to time passed in the game. Move zombie, if there's
+--   no collision with the plant, reduce health of the
+--   zombie, if there's collision with the plant's 
+--   projectile.
 updateZombies :: Float -> State -> [Zombie]
 updateZombies dt s = update zs  
   where
     update = map (updateZombie dt u)
            . deleteZombie
-           . (extract dt u)
+           . (shootZombie dt u)
     u      = sUniverse s
     zs     = uEnemies u
 
-extract :: Float -> Universe -> [Zombie] -> [Zombie]
-extract dt u zs = concat $ map applyOne $ groupBy pred zs
+-- | Function to reduce health of the zombies
+--   Groups zombies based on the equelness of coords,
+--   then for each group -> takes one zombie and reduce its
+--   health, if it has collision with projectiles.
+--
+--   It is done, because zombies can have same coords
+--   but should be killed in different times 
+shootZombie :: Float -> Universe -> [Zombie] -> [Zombie]
+shootZombie dt u zs = concat $ map applyOne $ groupBy predicate zs
   where
-    pred z1 z2 = zCoords z1 == zCoords z2
+    predicate z1 z2 = zCoords z1 == zCoords z2
     applyOne (z:xs) = attackZombie dt u z:xs
+    applyOne []     = []
 
 -- | Function to update one zombie in terms of moving zombie
--- further or not. It checks the collision with the plants:
--- defense plants and sunflowers and moves zombie further
--- if there's no collision, otherwise it stays at the same
--- place.
+--   further or not. It checks the collision with the plants:
+--   defense plants and sunflowers and moves zombie further
+--   if there's no collision, otherwise it stays at the same
+--   place.
 updateZombie :: Float -> Universe -> Zombie -> Zombie
 updateZombie dt u z
   | True `elem` collisions = bitePlant dt z
@@ -105,8 +117,8 @@ reduceHealthZombie dt (strength, pr) z
      { zDamage = zDamage z + strength }
 
 -- | Function to remove zombie from the game
--- if its health is less than the damage the
--- current zombie received.
+--   if its health is less than the damage the
+--   current zombie received.
 deleteZombie :: [Zombie] -> [Zombie]
 deleteZombie zs = filter (hasHealth) zs
   where
@@ -168,7 +180,9 @@ updateProjectiles dt u= map updProjectile
   where
     updProjectile p
       | (pType p) == PeasShooter = update p
+      | (pType p) == Wallnut = p
       | otherwise                = sendSun dt p
+
       where
         update = shootProjectile dt u
                . deleteProjectile u
@@ -227,9 +241,9 @@ moveProjectile dt pr = Projectile Pea (x + dt * 250, y)
 -- * Delete if projectile moved out of the game border
 -- * Delete if projectile has collision with the zombie
 deleteProjectile :: Universe-> Plant -> Plant
-deleteProjectile u p = p { pBullet = delete prs }
+deleteProjectile u p = p { pBullet = deleted prs }
   where
-    delete          = filter (hasCollision)
+    deleted         = filter (hasCollision)
                     . filter (outOfBorder)
     prs             = pBullet p
     zs              = uEnemies u
@@ -258,6 +272,11 @@ sendSun dt p
     newSun  = Projectile Sun (x + 70, y - 25)
     oldSuns = pBullet p
 
+-- | Function to update suns, which are falling from
+--   the suns.
+-- * If the time left to produce sun is less or equal
+--   to zero - universe produces new sun
+-- * Otherewise - reduces time rill sun production
 updateSuns :: Float -> State-> ([Projectile], Float)
 updateSuns dt s
   | seconds <= 0 = (send, uFrequency)
@@ -269,6 +288,10 @@ updateSuns dt s
     (ss, t) = uSuns u
     u       = sUniverse s
 
+-- | Function to update cards, depending on the time
+--   spent in the game.
+--   Iterated through the cards and performs updateCard
+--   for each card
 updateCards :: Float -> State -> [Card]
 updateCards dt s = update
   where
@@ -276,6 +299,12 @@ updateCards dt s = update
     cs     = uCards u
     u      = sUniverse s
 
+-- | Function to update card, depending on the time
+--   spent in the game.
+-- * Time less or equal to zero - player is able to
+--   choose card, in order to plant
+-- * Otherwise - reduce time till player will be able
+--   to pick card
 updateCard :: Float -> Card -> Card
 updateCard dt c
   | seconds <= 0 = c

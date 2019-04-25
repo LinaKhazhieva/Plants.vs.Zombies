@@ -5,7 +5,7 @@ module Settings where
 
 import Type
 import Graphics.Gloss
-import Structure.Object
+import Structure.Object()
 
 begginnerCoords :: Float
 begginnerCoords = -450
@@ -95,46 +95,47 @@ sampleZombies =
   , Zombie Basic (975, 50) 0 0
   , Zombie Basic (1000, 50) 0 0
   ]
+-- | Wave concisting of 1 enemy which is used as a filler 
+--   insert it in any level to check other attributes 
 
 checkWave :: [Zombie]
 checkWave = 
   [Zombie Basic (620, 50) 0 0]
 
+-- | Wave of enemies for level 2 
 zombieLvl2 :: [Zombie]
 zombieLvl2 =
   [Zombie Basic (620, 150) 0 0
-  , Zombie Basic (740, 50) 0 0
-  , Zombie Basic (820, 50) 0 0
+  , Zombie Basic (740, 150) 0 0
+  , Zombie Basic (820, 150) 0 0
   , Zombie Basic (920, -50) 0 0
+  , Zombie Basic (1020, 50) 0 0
+  , Zombie Basic (1020, 50) 0 0
   , Zombie Basic (1020, 50) 0 0
   ] 
 
-
+-- | Wave of enemies for level 3
 zombieLvl3 :: [Zombie]
 zombieLvl3 = 
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
-  , Zombie Basic (1200, 50) 0 0
+  , Zombie Basic (1200, 150) 0 0
   , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1600, 250) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
   , Zombie Basic (2000, -145) 0 0
   , Zombie Buckethead (2000, 150) 0 0
   ]
-  -- data Zombie = Zombie
-  -- { zType     :: ZombieType
-  -- , zCoords   :: Coords     -- ^ coordinates of zombie
-  -- , zDamage   :: Int        -- ^ damage the zombie received
-  -- , zSeconds  :: Float      -- ^ seconds tha is left till zombie bite
-  -- }
+
+-- | Wave of enemies for level 4
 zombieLvl4 :: [Zombie]
 zombieLvl4 = 
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
   , Zombie Basic (1200, 50) 0 0
   , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1600, 250) 0 0
   , Zombie Buckethead (1800, 50) 0 0
   , Zombie Buckethead (1820, 50) 0 0
   , Zombie Basic (1840, 50) 0 0
@@ -144,13 +145,14 @@ zombieLvl4 =
   , Zombie Buckethead (2060, 150) 0 0
   ]
 
+-- | Wave of enemies for level 5
 zombieLvl5 :: [Zombie]
 zombieLvl5 = 
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
   , Zombie Basic (1200, 50) 0 0
-  , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1400, 250) 0 0
+  , Zombie Basic (1600, 150) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
   , Zombie Basic (2000, -145) 0 0
@@ -185,9 +187,9 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State [] None level1 [level2, level3, level4, level5 ]
+initState = State [] False level1 [level2, level3, level4, level5 ]
 
--- | Starter universe
+-- | Level 1 Universe 
 level1 :: Universe
 level1 = Universe 
                sampleZombies
@@ -197,9 +199,10 @@ level1 = Universe
                False
                0
                150
-               1
-               4
+               One
+               EditName
 
+-- | Level 2 Universe 
 level2 :: Universe
 level2 = Universe
                 zombieLvl2
@@ -209,10 +212,10 @@ level2 = Universe
                 False
                 0
                 50
-                2
-                0
+                Two
+                Game
 
-
+-- | Level 3 Universe 
 level3 :: Universe
 level3 = Universe
                 zombieLvl3
@@ -222,9 +225,10 @@ level3 = Universe
                 False
                 0
                 50
-                3
-                0
+                Three
+                Game
 
+-- | Level 4 Universe 
 level4 :: Universe
 level4 = Universe
                 zombieLvl4
@@ -234,9 +238,10 @@ level4 = Universe
                 False
                 0
                 50
-                4
-                0
+                Four
+                Game
 
+-- | Level 5 Universe 
 level5 :: Universe
 level5 = Universe
                 zombieLvl5
@@ -246,14 +251,13 @@ level5 = Universe
                 False
                 0
                 50
-                5
-                0
+                Five
+                Game
 
 
-getLevel :: Int -> Universe
-getLevel 1 = level1 { uStage = 0 }
-getLevel 2 = level2
-getLevel 3 = level3
-getLevel 4 = level4
-getLevel 5 = level5
-getLevel _ = level5
+getLevel :: Level -> Universe
+getLevel One    = level1 { uStage = Game }
+getLevel Two    = level2
+getLevel Three  = level3
+getLevel Four   = level4
+getLevel Five   = level5

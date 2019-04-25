@@ -3,7 +3,6 @@
 module Type where
 
 import           Graphics.Gloss
-import           Structure.Alphabet
 import           Structure.Object
 
 -- | Type for coordinates on the field
@@ -23,7 +22,7 @@ data Zombie = Zombie
   }
   deriving (Show, Read)
 
--- | Accessor for the speed of the zombies
+-- | Accessor for the speed of the zombies 
 zSpeed :: ZombieType -> Float
 zSpeed Basic      = 10
 zSpeed Buckethead = 10
@@ -47,24 +46,27 @@ data Card = Card
   { isActive  :: Bool      -- ^ is Card currently chosen
   , plantType :: PlantType -- ^ type of Plant to plant if Card is active
   , cCoords   :: Coords    -- ^ Card coordinates
-  , cTime     :: Float
+  , cTime     :: Float     -- ^ Cooldown time
   }
   deriving (Show, Read)
 
+-- | Accessor to render card type
 cPicture :: PlantType -> Picture
 cPicture PeasShooter = peasshooterCard
 cPicture Sunflower   = sunflowerCard
 cPicture Wallnut = wallnutCard
 
+-- | Accessor of the card cost
 cMoney :: PlantType -> Int
 cMoney PeasShooter = 100
 cMoney Sunflower   = 50
-cMoney Wallnut = 50
+cMoney Wallnut     = 50
 
+-- | Accessor of the card cooldown
 cFrequency :: PlantType -> Float
 cFrequency PeasShooter = 5
 cFrequency Sunflower   = 5
-cFrequency Wallnut = 5  
+cFrequency Wallnut     = 20  
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower | Wallnut
@@ -72,7 +74,7 @@ data PlantType = PeasShooter | Sunflower | Wallnut
 
 -- | Data type for Plants
 data Plant = Plant
-  { pType    :: PlantType
+  { pType    :: PlantType    -- ^ plant type 
   , pCoords  :: Coords       -- ^ coordinates of plants
   , pDamage  :: Int          -- ^ damage the plant received
   , pBullet  :: [Projectile] -- ^ peas of the plant
@@ -80,12 +82,13 @@ data Plant = Plant
   }
   deriving (Show, Read)
 
-data ProjectileType = Sun | Pea
+-- | Aet of projectiles data  types
+data ProjectileType = Sun | Pea 
   deriving (Eq, Show, Read)
 
 -- | Data type for projectile of the other plant
 data Projectile = Projectile
-  { prType   :: ProjectileType
+  { prType   :: ProjectileType  -- ^ projectile type
   , prCoords :: Coords          -- ^ coordinates of projectile
   }
   deriving (Show, Read)
@@ -108,21 +111,24 @@ pPicture PeasShooter = plant
 pPicture Sunflower   = sunflower
 pPicture Wallnut = wallnut
 
+-- | Accessor for the cooldown of the projectile
 pFrequency :: PlantType -> Float
 pFrequency PeasShooter = 1.5
 pFrequency Sunflower   = 24
-pFrequency Wallnut = 1000000000
+pFrequency Wallnut = 1
 
+-- | Accessor for the starting cooldown of the projectile
 pStarterTimer :: PlantType -> Float
 pStarterTimer PeasShooter = 0
 pStarterTimer Sunflower   = 7
-pStarterTimer Wallnut = 100000000
+pStarterTimer Wallnut = 1
 
+-- | Accessor to render projectile type
 prPicture :: ProjectileType -> Picture
 prPicture Sun = sun
 prPicture Pea = projectile
 
--- | Data type for whole Universe
+-- | Data type for the whole Universe
 data Universe = Universe
   { uEnemies  :: [Zombie]              -- ^ predefined wave
   , uDefense  :: [Plant]               -- ^ list of plants that player put
@@ -132,40 +138,37 @@ data Universe = Universe
   , uOver     :: Bool                  -- ^ denotes if the game is over
   , uTime     :: Float                 -- ^ amount of time passed since start
   , uMoney    :: Int
-  , uLevelNum :: Int
-  , uStage    :: Int
+  , uLevelNum :: Level
+  , uStage    :: Stage
   }
   deriving (Show, Read)
 
-newScreen :: Int -> Int -> Picture
-
-newScreen 1 1 = sunflowerCard
-newScreen 1 2 = sunflowerAlmanac
-newScreen 2 1 = zombieNote
-newScreen 2 2 = zombieNoteNextLvl
-newScreen 3 1 = wallnutCard
-newScreen 3 2 = wallnutAlmanac
-newScreen 4 1 = zombieNote
-newScreen 4 2 = zombieNoteNextLvl
-newScreen 5 1 = finalNote
-newScreen 5 2 = finalNote
-
-newScreen _ 1 = sunflowerCard
-newScreen _ 2 = levelOne
-newScreen _ 3 = menu 
-newScreen _ 4 = menu <> user 
-newScreen _ _ = blank
-
-
-
--- | TODO: change to bool
-data EditType = Rename | None | OK
+data Stage = Game | NewCard | NextLevel | Menu | EditName
   deriving (Eq, Show, Read)
 
+data Level = One | Two | Three | Four | Five
+  deriving (Eq, Show, Read)
+
+-- | Function to determine what pictures to show depending on the level 
+newScreen :: Level -> Stage -> Picture
+newScreen One NewCard     = sunflowerCard
+newScreen One NextLevel   = sunflowerAlmanac
+newScreen Two NewCard     = zombieNote
+newScreen Two NextLevel   = zombieNoteNextLvl
+newScreen Three NewCard   = wallnutCard
+newScreen Three NextLevel = wallnutAlmanac
+newScreen Four NewCard    = zombieNote
+newScreen Four NextLevel  = zombieNoteNextLvl
+newScreen Five NewCard    = finalNote
+newScreen Five NextLevel  = finalNote
+newScreen _ Menu          = menu 
+newScreen _ EditName      = menu <> user 
+newScreen _ Game          = blank
+
 data State = State
-  { sName     :: UserName 
-  , sEdit     :: EditType
-  , sUniverse :: Universe
-  , sLevels   :: [Universe]
+  { sName     :: UserName   -- ^ name given by the current user
+  , sEdit     :: Bool       -- ^ denotes whether a user can use the keyboard or not
+  , sUniverse :: Universe   -- ^ current level
+  , sLevels   :: [Universe] -- ^ set of all levels
   }
   deriving (Show, Read)

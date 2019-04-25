@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
+
 module Game where
 
 import Structure.Object

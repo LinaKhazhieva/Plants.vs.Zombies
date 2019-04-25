@@ -6,6 +6,7 @@ module Update where
 import Type
 import Utils
 import Settings
+import Data.List
 
 -- | High-level function to attack zombie/plants
 attack
@@ -34,9 +35,15 @@ updateZombies dt s = update zs
   where
     update = map (updateZombie dt u)
            . deleteZombie
-           . map (attackZombie dt u)
+           . (extract dt u)
     u      = sUniverse s
     zs     = uEnemies u
+
+extract :: Float -> Universe -> [Zombie] -> [Zombie]
+extract dt u zs = concat $ map applyOne $ groupBy pred zs
+  where
+    pred z1 z2 = zCoords z1 == zCoords z2
+    applyOne (z:xs) = attackZombie dt u z:xs
 
 -- | Function to update one zombie in terms of moving zombie
 -- further or not. It checks the collision with the plants:

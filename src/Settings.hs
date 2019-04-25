@@ -103,9 +103,11 @@ checkWave =
 zombieLvl2 :: [Zombie]
 zombieLvl2 =
   [Zombie Basic (620, 150) 0 0
-  , Zombie Basic (740, 50) 0 0
-  , Zombie Basic (820, 50) 0 0
+  , Zombie Basic (740, 150) 0 0
+  , Zombie Basic (820, 150) 0 0
   , Zombie Basic (920, -50) 0 0
+  , Zombie Basic (1020, 50) 0 0
+  , Zombie Basic (1020, 50) 0 0
   , Zombie Basic (1020, 50) 0 0
   ] 
 

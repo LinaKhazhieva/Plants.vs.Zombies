@@ -6,6 +6,7 @@ module Update where
 import Type
 import Utils
 import Settings
+import Data.List
 
 -- | High-level function to attack zombie/plants
 attack
@@ -29,13 +30,20 @@ collisionPeasZombie pr (x, y) = checkCollision peasSize peasSize
 -- no collision with the plant, reduce health of the
 -- zombie, if there's collision with the plant's 
 -- projectile.
-updateZombies :: Float -> Universe -> [Zombie]
-updateZombies dt u = update zs  
+updateZombies :: Float -> State -> [Zombie]
+updateZombies dt s = update zs  
   where
     update = map (updateZombie dt u)
            . deleteZombie
-           . map (attackZombie dt u)
-    zs     = uEnemies u  
+           . (extract dt u)
+    u      = sUniverse s
+    zs     = uEnemies u
+
+extract :: Float -> Universe -> [Zombie] -> [Zombie]
+extract dt u zs = concat $ map applyOne $ groupBy pred zs
+  where
+    pred z1 z2 = zCoords z1 == zCoords z2
+    applyOne (z:xs) = attackZombie dt u z:xs
 
 -- | Function to update one zombie in terms of moving zombie
 -- further or not. It checks the collision with the plants:
@@ -110,19 +118,20 @@ deleteZombie zs = filter (hasHealth) zs
 --   Removing plants, if it has no health any more.
 --   Shooting with the peas, if it seas the zombie.
 --   Move projectiles
-updatePlants :: Float -> Universe -> [Plant]
-updatePlants dt u = update ps                     
+updatePlants :: Float -> State-> [Plant]
+updatePlants dt s = update ps                     
   where
     update = deletePlant
            . map (attackPlant dt u)
            . updateProjectiles dt u
+    u      = sUniverse s
     ps     = uDefense u
 
 -- | Function to lower health of plants
 --   iterate through zombies and lower health
 --   if their timer for bite is exceed
 attackPlant :: Float -> Universe -> Plant -> Plant
-attackPlant dt u = attack (reduceHealthPlant dt) zs
+attackPlant dt u= attack (reduceHealthPlant dt) zs
   where
     zs = uEnemies u
 
@@ -155,7 +164,7 @@ deletePlant ps = filter (hasHealth) ps
 -- * Perform moving projectile along x-axis
 -- * Perform deleting projectile
 updateProjectiles :: Float -> Universe -> [Plant] -> [Plant]
-updateProjectiles dt u = map updProjectile
+updateProjectiles dt u= map updProjectile
   where
     updProjectile p
       | (pType p) == PeasShooter = update p
@@ -217,7 +226,7 @@ moveProjectile dt pr = Projectile Pea (x + dt * 250, y)
 -- | Fucntion to delete projectile from the plant
 -- * Delete if projectile moved out of the game border
 -- * Delete if projectile has collision with the zombie
-deleteProjectile :: Universe -> Plant -> Plant
+deleteProjectile :: Universe-> Plant -> Plant
 deleteProjectile u p = p { pBullet = delete prs }
   where
     delete          = filter (hasCollision)
@@ -249,8 +258,8 @@ sendSun dt p
     newSun  = Projectile Sun (x + 70, y - 25)
     oldSuns = pBullet p
 
-updateSuns :: Float -> Universe -> ([Projectile], Float)
-updateSuns dt u
+updateSuns :: Float -> State-> ([Projectile], Float)
+updateSuns dt s
   | seconds <= 0 = (send, uFrequency)
   | otherwise    = (ss, seconds)
   where
@@ -258,12 +267,14 @@ updateSuns dt u
     send    = newSun : ss
     newSun  = Projectile Sun (90, -25) 
     (ss, t) = uSuns u
+    u       = sUniverse s
 
-updateCards :: Float -> Universe -> [Card]
-updateCards dt u = update
+updateCards :: Float -> State -> [Card]
+updateCards dt s = update
   where
     update = map (updateCard dt) cs
     cs     = uCards u
+    u      = sUniverse s
 
 updateCard :: Float -> Card -> Card
 updateCard dt c

@@ -116,9 +116,9 @@ zombieLvl3 :: [Zombie]
 zombieLvl3 = 
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
-  , Zombie Basic (1200, 50) 0 0
+  , Zombie Basic (1200, 150) 0 0
   , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1600, 250) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
   , Zombie Basic (2000, -145) 0 0
@@ -136,7 +136,7 @@ zombieLvl4 =
   , Zombie Basic (1000, -145) 0 0
   , Zombie Basic (1200, 50) 0 0
   , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1600, 250) 0 0
   , Zombie Buckethead (1800, 50) 0 0
   , Zombie Buckethead (1820, 50) 0 0
   , Zombie Basic (1840, 50) 0 0
@@ -151,8 +151,8 @@ zombieLvl5 =
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
   , Zombie Basic (1200, 50) 0 0
-  , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1400, 250) 0 0
+  , Zombie Basic (1600, 150) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
   , Zombie Basic (2000, -145) 0 0

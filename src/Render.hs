@@ -76,10 +76,12 @@ drawCard m card
                  (cardHeight + cardLiningThickness * 2))
     (x, y)     = cCoords card
 
+-- | Function to draw money of the player
 drawMoney :: Int -> Picture
 drawMoney m = Translate (-650) (227) pic
   where
     pic = numPicture m
 
+-- | Function to draw menu button
 renderMenuButton :: Picture
 renderMenuButton = Translate 600 260 menuButton

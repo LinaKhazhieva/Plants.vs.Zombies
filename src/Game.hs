@@ -19,18 +19,20 @@ import System.Directory
 -- | Function to render universe
 drawState :: State -> Picture
 drawState s
-  | uStage u == 3             = newScreen (uLevelNum u) 3 
-                             <> Translate (-595) 216.5
-                                (scale 0.7 0.7 (strPicture (sName s)))
-  | uStage u == 4             = newScreen (uLevelNum u) 4
-                             <> Translate 0 85 (strPicture (sName s))
-                             <> Translate (-595) 216.5
-                                (scale 0.7 0.7 (strPicture (sName s))) 
-  | uStage u == 2             = pic <> newScreen (uLevelNum u) 2
-  | isWon u && uStage u == 0  = pic <> newScreen (uLevelNum u) 0
-  | uStage u == 1             = pic <> newScreen (uLevelNum u) 1
-  | isLost u && uStage u == 0 = pic <> lost
-  | otherwise                 = pic 
+  | uStage u == Menu      = newScreen (uLevelNum u) Menu 
+                         <> Translate (-595) 216.5
+                            (scale 0.7 0.7 (strPicture (sName s)))
+  | uStage u == EditName  = newScreen (uLevelNum u) EditName
+                         <> Translate 0 85 (strPicture (sName s))
+                         <> Translate (-595) 216.5
+                            (scale 0.7 0.7 (strPicture (sName s))) 
+  | uStage u == NextLevel = pic <> newScreen (uLevelNum u) NextLevel
+  | isWon u 
+    && uStage u == Game   = pic <> newScreen (uLevelNum u) Game
+  | uStage u == NewCard   = pic <> newScreen (uLevelNum u) NewCard
+  | isLost u 
+    && uStage u == Game   = pic <> lost
+  | otherwise             = pic 
   where
     prs      = concat (map pBullet ps)
     zs       = uEnemies u
@@ -48,15 +50,14 @@ drawState s
 --   to its rules by the interaction with the player
 handleState :: Event -> State -> State
 handleState (EventKey (MouseButton LeftButton)
-               Down _ mouseCoords) s = handleCoords mouseCoords s
-handleState (EventKey (Char c) Down _ _)
-            s = if sEdit s == Rename 
-                  then handleMenu c s
-                  else s
+               Down _ mouseCoords) s       = handleCoords mouseCoords s
+handleState (EventKey (Char c) Down _ _) s = if sEdit s 
+                                              then addChar c s
+                                              else s
 handleState (EventKey (SpecialKey KeyDelete)
-            Down _ _) s = if sEdit s == Rename
-                            then deleteChar s
-                            else s
+            Down _ _) s                    = if sEdit s
+                                              then deleteChar s
+                                              else s
 handleState _  s = s
 
 -- | Function to change universe according
@@ -64,10 +65,12 @@ handleState _  s = s
 --   detect if the game is over
 updateState :: Float -> State -> State
 updateState dt s
-  | isWon u && uStage u == 0       = s { sUniverse = wonU }
-  | isLost u                       = s
-  | not (isWon u) && uStage u == 0 = s { sUniverse = newU }
-  | otherwise                      = s
+  | isWon u 
+    && uStage u == Game = s { sUniverse = wonU }
+  | isLost u            = s
+  | not (isWon u)
+    && uStage u == Game = s { sUniverse = newU }
+  | otherwise           = s
   where
     newEnemies = updateZombies dt s 
     newDefense = updatePlants dt s
@@ -76,7 +79,7 @@ updateState dt s
     newTime    = (uTime u) + dt
     u          = sUniverse s
     wonU       = u
-     { uStage  = 1 } 
+     { uStage  = NewCard } 
     newU       = u
         { uEnemies = newEnemies
         , uDefense = newDefense
@@ -89,14 +92,17 @@ drawStateIO :: State -> IO Picture
 drawStateIO s = return (drawState s)
 
 handleStateIO :: Event -> State -> IO State
-handleStateIO (EventKey (SpecialKey KeyF2) Down _ _) s = saveState s
+handleStateIO (EventKey (SpecialKey KeyF2)
+               Down _ _) s  = saveState s
 handleStateIO (EventKey (MouseButton LeftButton)
-               Down _ mouseCoords) s = if uStage (sUniverse s) == 4
-                                          then checkField mouseCoords s
-                                          else return $ handleCoords mouseCoords s
-handleStateIO (EventKey (SpecialKey KeyEsc) Down _ _) s = do _ <- saveState s
-                                                             exitSuccess
-handleStateIO e s = return $ handleState e s
+               Down _ mc) s = if uStage (sUniverse s) == EditName
+                                then checkField mc s
+                                else return $ handleCoords mc s
+handleStateIO (EventKey (SpecialKey KeyEsc)
+               Down _ _) s  = do _ <- saveState s
+                                 exitSuccess
+handleStateIO e s            = return $ handleState e s
+
 
 updateStateIO :: Float -> State -> IO State
 updateStateIO dt = return . updateState dt
@@ -135,4 +141,4 @@ perform = do
                       let path = "save/" ++ name ++ ".txt"
                       strState <- readFile path
                       let s    = read $ strState
-                      gameIO $ s { sUniverse = (sUniverse s) { uStage = 3 } }
+                      gameIO $ s { sUniverse = (sUniverse s) { uStage = Menu } }

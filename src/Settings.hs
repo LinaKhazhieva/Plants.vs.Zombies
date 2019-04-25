@@ -103,9 +103,11 @@ checkWave =
 zombieLvl2 :: [Zombie]
 zombieLvl2 =
   [Zombie Basic (620, 150) 0 0
-  , Zombie Basic (740, 50) 0 0
-  , Zombie Basic (820, 50) 0 0
+  , Zombie Basic (740, 150) 0 0
+  , Zombie Basic (820, 150) 0 0
   , Zombie Basic (920, -50) 0 0
+  , Zombie Basic (1020, 50) 0 0
+  , Zombie Basic (1020, 50) 0 0
   , Zombie Basic (1020, 50) 0 0
   ] 
 
@@ -114,9 +116,9 @@ zombieLvl3 :: [Zombie]
 zombieLvl3 = 
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
-  , Zombie Basic (1200, 50) 0 0
+  , Zombie Basic (1200, 150) 0 0
   , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1600, 250) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
   , Zombie Basic (2000, -145) 0 0
@@ -134,7 +136,7 @@ zombieLvl4 =
   , Zombie Basic (1000, -145) 0 0
   , Zombie Basic (1200, 50) 0 0
   , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1600, 250) 0 0
   , Zombie Buckethead (1800, 50) 0 0
   , Zombie Buckethead (1820, 50) 0 0
   , Zombie Basic (1840, 50) 0 0
@@ -149,8 +151,8 @@ zombieLvl5 =
   [ Zombie Basic (620, 250) 0 0  
   , Zombie Basic (1000, -145) 0 0
   , Zombie Basic (1200, 50) 0 0
-  , Zombie Basic (1400, 50) 0 0
-  , Zombie Basic (1600, 50) 0 0
+  , Zombie Basic (1400, 250) 0 0
+  , Zombie Basic (1600, 150) 0 0
   , Zombie Basic (1800, 50) 0 0
   , Zombie Basic (2000, -50) 0 0
   , Zombie Basic (2000, -145) 0 0
@@ -185,7 +187,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
                        ++ initCards ps (x + cardWidth + cardsDistance, y)
 
 initState :: State
-initState = State [] None level1 [level2, level3, level4, level5 ]
+initState = State [] False level1 [level2, level3, level4, level5 ]
 
 -- | Starter universe
 level1 :: Universe
@@ -197,8 +199,8 @@ level1 = Universe
                False
                0
                150
-               1
-               4
+               One
+               EditName
 
 level2 :: Universe
 level2 = Universe
@@ -209,8 +211,8 @@ level2 = Universe
                 False
                 0
                 50
-                2
-                0
+                Two
+                Game
 
 
 level3 :: Universe
@@ -222,8 +224,8 @@ level3 = Universe
                 False
                 0
                 50
-                3
-                0
+                Three
+                Game
 
 level4 :: Universe
 level4 = Universe
@@ -234,8 +236,8 @@ level4 = Universe
                 False
                 0
                 50
-                4
-                0
+                Four
+                Game
 
 level5 :: Universe
 level5 = Universe
@@ -246,14 +248,13 @@ level5 = Universe
                 False
                 0
                 50
-                5
-                0
+                Five
+                Game
 
 
-getLevel :: Int -> Universe
-getLevel 1 = level1 { uStage = 0 }
-getLevel 2 = level2
-getLevel 3 = level3
-getLevel 4 = level4
-getLevel 5 = level5
-getLevel _ = level5
+getLevel :: Level -> Universe
+getLevel One    = level1 { uStage = Game }
+getLevel Two    = level2
+getLevel Three  = level3
+getLevel Four   = level4
+getLevel Five   = level5

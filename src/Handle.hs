@@ -1,4 +1,3 @@
-
 {-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -14,46 +13,52 @@ import           System.Directory
 -- | Function to change the universe, based on the
 --   left click of the mouse inside the screen border
 handleCoords :: Coords -> State-> State
-handleCoords mc (State _n _t u [])
-  | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) []
-  | isLost u && uStage u == 0  = State _n _t (getLevel (uLevelNum u)) []
-  | uStage u == 3              = State _n _t (startGame mc u) [] 
-  | not (isWon u)              = State _n _t (handleProcess mc u) []
-  | otherwise                  = State _n _t u []
-handleCoords mc (State _n _t u (next:us))
-  | isWon u && uStage u == 1   = State _n _t (handleNextScreen u) (next:us)
-  | isWon u && uStage u == 2   = State _n _t next us
-  | isLost u && uStage u == 0  = State _n _t (getLevel (uLevelNum u)) (next:us)
-  | uStage u == 3              = State _n _t (startGame mc u) (next:us)
-  | not (isWon u)              = State _n _t (handleProcess mc u) (next:us)
-  | otherwise                  = State _n _t u (next:us)              
+handleCoords mc s
+  | isWon u && uStage u == NewCard   = s { sUniverse = handleNext u }
+  | isLost u && uStage u == Game     = s { sUniverse = getLevel $ uLevelNum u }
+  | isWon u && uStage u == NextLevel = newU $ sLevels s
+  | uStage u == Menu                 = s { sUniverse = startGame mc u } 
+  | not (isWon u)                    = s { sUniverse = goToMenu mc u }
+  | otherwise                        = s
+  where
+    newU (n:us) = s { sUniverse = n
+                    , sLevels   = us
+                    }
+    newU []     = s
+    u           = sUniverse s              
  
-
-handleProcess :: Coords -> Universe -> Universe
-handleProcess mc u = changeScreen
+-- | Function to handle if the player clicked on the menu
+--   button or proceed with the game.
+--   Checks if the mouse coord lie in the range of the menu
+--   button, if yes -> go to menu screen
+--   if no -> update universe, based on the place, where mouse
+--   coords clicked
+goToMenu :: Coords -> Universe -> Universe
+goToMenu mc u = changeScreen
   where
     isButton                  = checkMouse mc (600, 260) 175 70
     changeScreen              = if isButton
                                   then newU
                                   else handleU
     newU                      = u
-                    { uStage  = 3 }
+                    { uStage  = Menu }
     handleU                   = u
                    { uDefense = newDefense
                    , uCards   = newCards
                    , uSuns    = newSuns
                    , uMoney   = updMoney
                    }
-
     (newDefense, updCs, newM) = handlePlants mc u
     newCards                  = handleCards mc u updCs
     (newSuns, updMoney)       = if newM == uMoney u
                                   then handleSuns mc u newM
                                   else (uSuns u, newM)
 
-handleNextScreen :: Universe -> Universe
-handleNextScreen u = u
-         { uStage  = 2 }
+-- | Function to show middle screen after winning the
+--   level
+handleNext :: Universe -> Universe
+handleNext u = u
+         { uStage  = NextLevel }
 
 -- | Function to handle picking plant card
 -- * if any card is active and mouse was clicked
@@ -240,36 +245,60 @@ invertCardActive card = card { isActive = not active }
   where
     active = isActive card
 
-
-handleMenu :: Char -> State -> State
-handleMenu c s = if length (sName s) > 10
+-- | Function to add char to the username.
+--   Restricted to ten letters in the username
+--   Because of the way username is printed,
+--   new char is added to the end of the list
+addChar :: Char -> State -> State
+addChar c s = if length (sName s) > 10
                     then s
                     else s { sName = ((sName s) ++ [c]) }
 
+-- | Function to remove letter from the username
+--   In order, to perform it purely, reverses string
+--   and takes the head and returns the reversed end
+--   of list. If username is empty, does nothing
 deleteChar :: State -> State
 deleteChar s = change name
   where
-    name = uncons (reverse (sName s))
-    change n = 
-      case n of
-        Nothing          -> s
-        Just (_h, chars) -> s { sName = reverse chars }
+    name = reverse (sName s)
+    change (_c:left) = s { sName = reverse left }
+    change []        = s
 
+-- | Function to perform changings of the username
+-- * if clicked rename -> allow adding chars to username
+--                        and removing chars from username
+-- * if clicked delete -> deletes the saving and creates
+--                        new game from the beginning,
+--                        should enter new user name to proceed
+-- * if clicked ok     -> stores all the editting
+-- * if clicked cancel -> cancels all the editting
+-- * otherwise         -> does nothing
 checkField :: Coords -> State -> IO State
-checkField mc s = upd
+checkField mc s
+  | isRename  = return $ s { sEdit = True }
+  | isDelete  = return $ startNew
+  | isOK      = saveName s
+  | isCancel  = cancelEdit s
+  | otherwise = return $ s
   where
     isRename = checkMouse mc (-136, -160) 248 40
     isDelete = checkMouse mc (135, -160) 248 40
     isOK     = checkMouse mc (-136, -207) 248 40 && (length (sName s) /= 0)
     isCancel = checkMouse mc (135, -227) 248 40
-    upd = case () of _
-                      | isRename  -> return $ s { sEdit = Rename }
-                      | isDelete  -> return $ initState { sUniverse = (sUniverse initState) { uStage = 4 } } 
-                      | isOK      -> saveName s
-                      | isCancel  -> cancelEdit s
-                      | otherwise -> return $ s
+    startNew = initState { sUniverse = 
+                            (sUniverse initState) { uStage = EditName } }   
         
-
+-- | Function to handle state, when player canceled
+--   all its edittings.
+--   Read userName file to know the old username of
+--   saving.
+-- * If there were no
+--   username at all        -> does not allow to go to the
+--   (game just started)       main menu screen
+-- * If the username exists -> load saving file and
+--                             return to the main
+--                             menu
 cancelEdit :: State -> IO State
 cancelEdit s = do name <- readFile "save/userName.txt"
                   case length name of
@@ -279,9 +308,20 @@ cancelEdit s = do name <- readFile "save/userName.txt"
     loadSaving n = do let path = "save/" ++ n ++ ".txt"
                       strState <- readFile path
                       let st    = read $ strState
-                      return st { sUniverse = (sUniverse st) { uStage = 3 } }
+                      return st { sUniverse = (sUniverse st) { uStage = Menu } }
 
-
+-- | Function to handle state, when the player
+--   wants to apply its changes.
+--   Reads old username.
+-- * If it first session    -> writes the file new
+--                             username, saves state
+--                             in the file, returns
+--                             to main Menu
+-- * If name did not change -> saves state in the
+--                             file
+-- * If name changed        -> rename saving file
+--                             rewrite username
+--                             save state
 saveName :: State -> IO State
 saveName s = do name <- readFile "save/userName.txt"
                 case () of _
@@ -295,22 +335,28 @@ saveName s = do name <- readFile "save/userName.txt"
                       let path = "save/" ++ sName s ++ ".txt" 
                       let path2 = "save/" ++ n ++ ".txt"
                       renameFile path2 path
-                      saveState $ s { sUniverse = u { uStage = 3}}
-    goBack       = s { sEdit     = None
-                     , sUniverse = u { uStage = 3 }
+                      saveState $ s { sUniverse = u { uStage = Menu}}
+    goBack       = s { sEdit     = False
+                     , sUniverse = u { uStage = Menu }
                      }
     u            = sUniverse s 
 
+-- | Function to handle user clicks in the main Menu
+-- * if clicked start -> change state to player state
+-- * if clicked edit  -> change state to change username
+--                       state
 startGame :: Coords -> Universe -> Universe
-startGame mc u = upd
+startGame mc u
+  | isStart   = u { uStage = Menu }
+  | isEdit    = u { uStage = EditName }
+  | otherwise = u
   where
     isStart = checkMouse mc (-275, 55) 250 110
     isEdit  = checkMouse mc (-574, 170) 212 40
-    upd     = case () of _
-                          | isStart   -> u { uStage = 0 }
-                          | isEdit    -> u { uStage = 4 } 
-                          | otherwise -> u
 
+-- | Function to save game in file
+--   Writes to the file with the name, which
+--   corresponds to player's username
 saveState :: State -> IO State
 saveState s = do
   let path = "save/" ++ sName s ++ ".txt"

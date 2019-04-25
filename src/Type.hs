@@ -58,12 +58,12 @@ cPicture Wallnut = wallnutCard
 cMoney :: PlantType -> Int
 cMoney PeasShooter = 100
 cMoney Sunflower   = 50
-cMoney Wallnut = 50
+cMoney Wallnut     = 50
 
 cFrequency :: PlantType -> Float
 cFrequency PeasShooter = 5
 cFrequency Sunflower   = 5
-cFrequency Wallnut = 5  
+cFrequency Wallnut     = 20  
 
 -- | Data type to store different types of plant
 data PlantType = PeasShooter | Sunflower | Wallnut
@@ -131,39 +131,35 @@ data Universe = Universe
   , uOver     :: Bool                  -- ^ denotes if the game is over
   , uTime     :: Float                 -- ^ amount of time passed since start
   , uMoney    :: Int
-  , uLevelNum :: Int
-  , uStage    :: Int
+  , uLevelNum :: Level
+  , uStage    :: Stage
   }
   deriving (Show, Read)
 
-newScreen :: Int -> Int -> Picture
-
-newScreen 1 1 = sunflowerCard
-newScreen 1 2 = sunflowerAlmanac
-newScreen 2 1 = zombieNote
-newScreen 2 2 = zombieNoteNextLvl
-newScreen 3 1 = wallnutCard
-newScreen 3 2 = wallnutAlmanac
-newScreen 4 1 = zombieNote
-newScreen 4 2 = zombieNoteNextLvl
-newScreen 5 1 = finalNote
-newScreen 5 2 = finalNote
-
-newScreen _ 1 = sunflowerCard
-newScreen _ 2 = levelOne
-newScreen _ 3 = menu 
-newScreen _ 4 = menu <> user 
-newScreen _ _ = blank
-
-
-
--- | TODO: change to bool
-data EditType = Rename | None | OK
+data Stage = Game | NewCard | NextLevel | Menu | EditName
   deriving (Eq, Show, Read)
+
+data Level = One | Two | Three | Four | Five
+  deriving (Eq, Show, Read)
+
+newScreen :: Level -> Stage -> Picture
+newScreen One NewCard     = sunflowerCard
+newScreen One NextLevel   = sunflowerAlmanac
+newScreen Two NewCard     = zombieNote
+newScreen Two NextLevel   = zombieNoteNextLvl
+newScreen Three NewCard   = wallnutCard
+newScreen Three NextLevel = wallnutAlmanac
+newScreen Four NewCard    = zombieNote
+newScreen Four NextLevel  = zombieNoteNextLvl
+newScreen Five NewCard    = finalNote
+newScreen Five NextLevel  = finalNote
+newScreen _ Menu          = menu 
+newScreen _ EditName      = menu <> user 
+newScreen _ Game          = blank
 
 data State = State
   { sName     :: UserName 
-  , sEdit     :: EditType
+  , sEdit     :: Bool
   , sUniverse :: Universe
   , sLevels   :: [Universe]
   }

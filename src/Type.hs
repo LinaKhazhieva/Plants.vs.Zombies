@@ -54,17 +54,20 @@ data Card = Card
 cPicture :: PlantType -> Picture
 cPicture PeasShooter = peasshooterCard
 cPicture Sunflower   = sunflowerCard
+cPicture Wallnut = wallnutCard
 
 cMoney :: PlantType -> Int
 cMoney PeasShooter = 100
 cMoney Sunflower   = 50
+cMoney Wallnut = 50
 
 cFrequency :: PlantType -> Float
 cFrequency PeasShooter = 5
 cFrequency Sunflower   = 5
+cFrequency Wallnut = 5  
 
 -- | Data type to store different types of plant
-data PlantType = PeasShooter | Sunflower
+data PlantType = PeasShooter | Sunflower | Wallnut
   deriving (Eq, Show, Read)
 
 -- | Data type for Plants
@@ -91,24 +94,29 @@ data Projectile = Projectile
 pHealth :: PlantType -> Int
 pHealth PeasShooter = 300
 pHealth Sunflower   = 300
+pHealth Wallnut = 4000
 
 -- | Accessor for the plant strength
 pStrength :: PlantType -> Int
 pStrength PeasShooter = 20
 pStrength Sunflower   = 0
+pStrength Wallnut = 0
 
 -- | Accessor to render plant type
 pPicture :: PlantType -> Picture
 pPicture PeasShooter = plant
 pPicture Sunflower   = sunflower
+pPicture Wallnut = wallnut
 
 pFrequency :: PlantType -> Float
 pFrequency PeasShooter = 1.5
 pFrequency Sunflower   = 24
+pFrequency Wallnut = 1000000000
 
 pStarterTimer :: PlantType -> Float
 pStarterTimer PeasShooter = 0
 pStarterTimer Sunflower   = 7
+pStarterTimer Wallnut = 100000000
 
 prPicture :: ProjectileType -> Picture
 prPicture Sun = sun
@@ -130,6 +138,18 @@ data Universe = Universe
   deriving (Show, Read)
 
 newScreen :: Int -> Int -> Picture
+
+newScreen 1 1 = sunflowerCard
+newScreen 1 2 = sunflowerAlmanac
+newScreen 2 1 = zombieNote
+newScreen 2 2 = zombieNoteNextLvl
+newScreen 3 1 = wallnutCard
+newScreen 3 2 = wallnutAlmanac
+newScreen 4 1 = zombieNote
+newScreen 4 2 = zombieNoteNextLvl
+newScreen 5 1 = finalNote
+newScreen 5 2 = finalNote
+
 newScreen _ 1 = sunflowerCard
 newScreen _ 2 = levelOne
 newScreen _ 3 = menu 

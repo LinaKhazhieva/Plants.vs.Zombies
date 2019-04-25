@@ -1,3 +1,4 @@
+
 {-# OPTIONS_GHC -Wall -fdefer-typed-holes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -127,7 +128,7 @@ putPlant (active, coords) ps m =
   where
     collisions xy = checkCollision size size size size xy
     canBuy card   = cMoney (plantType card) > m
-    size          = plantSize
+    size          = plantSize - 10
     sub card      = m - cMoney (plantType card)
     pXY           = map pCoords ps
     newC c        = Just (c { cTime = cFrequency (plantType c) })

@@ -5,7 +5,7 @@ module Settings where
 
 import Type
 import Graphics.Gloss
-import Structure.Object
+import Structure.Object()
 
 begginnerCoords :: Float
 begginnerCoords = -450

@@ -1,13 +1,18 @@
+![](assets/logo.jpg)
+
 # Plants vs. Zombies in Haskell
 
 <!-- [![Build Status](https://travis-ci.org/iu-haskell-fall-2018/project-template.svg?branch=master)](https://travis-ci.org/iu-haskell-fall-2018/project-template) -->
 
 Haskell project 2019 spring Innopolis University.
 
+![](assets/fight.gif)
+
 ### Members
-* Elena Lebedeva
 * Kamilla Borodina
 * Alina Chasova
+
+![](assets/name.gif)
 
 ### Prerequisites
 

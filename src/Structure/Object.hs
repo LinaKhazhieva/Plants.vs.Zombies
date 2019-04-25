@@ -101,6 +101,8 @@ six = pic
 
 seven :: Picture
 seven = pic
+ where
+    pic = loadPicture "images/seven.bmp"
 
 menu :: Picture
 menu = pic

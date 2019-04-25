@@ -119,11 +119,6 @@ menuButton = pic
   where
     pic = loadPicture "images/menu_button.bmp"
 
-checkF :: Picture
-checkF = pic
-  where
-    pic = loadPicture "images/check.bmp"
-
 field :: Picture
 field = pic 
      <> Translate (-461.25) 256.5 cardBlock

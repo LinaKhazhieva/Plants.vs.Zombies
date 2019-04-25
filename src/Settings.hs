@@ -201,7 +201,7 @@ level1 = Universe
                150
                1
                4
-
+               
 level2 :: Universe
 level2 = Universe
                 zombieLvl2

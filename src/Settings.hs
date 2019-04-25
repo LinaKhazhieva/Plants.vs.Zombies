@@ -95,11 +95,14 @@ sampleZombies =
   , Zombie Basic (975, 50) 0 0
   , Zombie Basic (1000, 50) 0 0
   ]
+-- | Wave concisting of 1 enemy which is used as a filler 
+--   insert it in any level to check other attributes 
 
 checkWave :: [Zombie]
 checkWave = 
   [Zombie Basic (620, 50) 0 0]
 
+-- | Wave of enemies for level 2 
 zombieLvl2 :: [Zombie]
 zombieLvl2 =
   [Zombie Basic (620, 150) 0 0
@@ -109,7 +112,7 @@ zombieLvl2 =
   , Zombie Basic (1020, 50) 0 0
   ] 
 
-
+-- | Wave of enemies for level 3
 zombieLvl3 :: [Zombie]
 zombieLvl3 = 
   [ Zombie Basic (620, 250) 0 0  
@@ -122,12 +125,8 @@ zombieLvl3 =
   , Zombie Basic (2000, -145) 0 0
   , Zombie Buckethead (2000, 150) 0 0
   ]
-  -- data Zombie = Zombie
-  -- { zType     :: ZombieType
-  -- , zCoords   :: Coords     -- ^ coordinates of zombie
-  -- , zDamage   :: Int        -- ^ damage the zombie received
-  -- , zSeconds  :: Float      -- ^ seconds tha is left till zombie bite
-  -- }
+
+-- | Wave of enemies for level 4
 zombieLvl4 :: [Zombie]
 zombieLvl4 = 
   [ Zombie Basic (620, 250) 0 0  
@@ -144,6 +143,7 @@ zombieLvl4 =
   , Zombie Buckethead (2060, 150) 0 0
   ]
 
+-- | Wave of enemies for level 5
 zombieLvl5 :: [Zombie]
 zombieLvl5 = 
   [ Zombie Basic (620, 250) 0 0  
@@ -187,7 +187,7 @@ initCards (p:ps) (x, y) = [Card False p (x, y) (cFrequency p)]
 initState :: State
 initState = State [] None level1 [level2, level3, level4, level5 ]
 
--- | Starter universe
+-- | Level 1 Universe 
 level1 :: Universe
 level1 = Universe 
                sampleZombies
@@ -200,6 +200,7 @@ level1 = Universe
                1
                4
 
+-- | Level 2 Universe 
 level2 :: Universe
 level2 = Universe
                 zombieLvl2
@@ -212,7 +213,7 @@ level2 = Universe
                 2
                 0
 
-
+-- | Level 3 Universe 
 level3 :: Universe
 level3 = Universe
                 zombieLvl3
@@ -225,6 +226,7 @@ level3 = Universe
                 3
                 0
 
+-- | Level 4 Universe 
 level4 :: Universe
 level4 = Universe
                 zombieLvl4
@@ -237,6 +239,7 @@ level4 = Universe
                 4
                 0
 
+-- | Level 5 Universe 
 level5 :: Universe
 level5 = Universe
                 zombieLvl5

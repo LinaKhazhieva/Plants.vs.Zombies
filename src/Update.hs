@@ -180,7 +180,9 @@ updateProjectiles dt u= map updProjectile
   where
     updProjectile p
       | (pType p) == PeasShooter = update p
+      | (pType p) == Wallnut = p
       | otherwise                = sendSun dt p
+
       where
         update = shootProjectile dt u
                . deleteProjectile u

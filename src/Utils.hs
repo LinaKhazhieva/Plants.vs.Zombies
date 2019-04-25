@@ -27,11 +27,16 @@ checkCollision w1 h1 w2 h2 (x1, y1) (x2, y2)
     realX2 = x2 - (w2 / 2)
     realY2 = y2 - (h2 / 2)
 
+-- | Function to check whether the user has won the level
+-- Returns true if the list of enemies is empty, otherwise false
 isWon :: Universe -> Bool
 isWon u = length z == 0
   where
     z = uEnemies u
 
+-- | Function to check whether the user has lost the level
+-- Returns true if at least 1 enemy has crossed the left boudary of the field (begginnerCoords),
+-- otherwise false
 isLost :: Universe -> Bool
 isLost u = some
   where

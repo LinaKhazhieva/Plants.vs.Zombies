@@ -79,7 +79,7 @@ data Plant = Plant
   }
   deriving (Show, Read)
 
-data ProjectileType = Sun | Pea
+data ProjectileType = Sun | Pea 
   deriving (Eq, Show, Read)
 
 -- | Data type for projectile of the other plant
@@ -110,16 +110,17 @@ pPicture Wallnut = wallnut
 pFrequency :: PlantType -> Float
 pFrequency PeasShooter = 1.5
 pFrequency Sunflower   = 24
-pFrequency Wallnut = 1000000000
+pFrequency Wallnut = 1
 
 pStarterTimer :: PlantType -> Float
 pStarterTimer PeasShooter = 0
 pStarterTimer Sunflower   = 7
-pStarterTimer Wallnut = 100000000
+pStarterTimer Wallnut = 1
 
 prPicture :: ProjectileType -> Picture
 prPicture Sun = sun
 prPicture Pea = projectile
+-- prPicture NoProjectile = blank
 
 -- | Data type for whole Universe
 data Universe = Universe

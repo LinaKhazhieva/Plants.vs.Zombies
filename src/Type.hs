@@ -22,7 +22,7 @@ data Zombie = Zombie
   }
   deriving (Show, Read)
 
--- | Accessor for the speed of the zombies
+-- | Accessor for the speed of the zombies 
 zSpeed :: ZombieType -> Float
 zSpeed Basic      = 10
 zSpeed Buckethead = 10
@@ -46,20 +46,23 @@ data Card = Card
   { isActive  :: Bool      -- ^ is Card currently chosen
   , plantType :: PlantType -- ^ type of Plant to plant if Card is active
   , cCoords   :: Coords    -- ^ Card coordinates
-  , cTime     :: Float
+  , cTime     :: Float     -- ^ Cooldown time
   }
   deriving (Show, Read)
 
+-- | Accessor to render card type
 cPicture :: PlantType -> Picture
 cPicture PeasShooter = peasshooterCard
 cPicture Sunflower   = sunflowerCard
 cPicture Wallnut = wallnutCard
 
+-- | Accessor of the card cost
 cMoney :: PlantType -> Int
 cMoney PeasShooter = 100
 cMoney Sunflower   = 50
 cMoney Wallnut     = 50
 
+-- | Accessor of the card cooldown
 cFrequency :: PlantType -> Float
 cFrequency PeasShooter = 5
 cFrequency Sunflower   = 5
@@ -71,7 +74,7 @@ data PlantType = PeasShooter | Sunflower | Wallnut
 
 -- | Data type for Plants
 data Plant = Plant
-  { pType    :: PlantType
+  { pType    :: PlantType    -- ^ plant type 
   , pCoords  :: Coords       -- ^ coordinates of plants
   , pDamage  :: Int          -- ^ damage the plant received
   , pBullet  :: [Projectile] -- ^ peas of the plant
@@ -79,12 +82,13 @@ data Plant = Plant
   }
   deriving (Show, Read)
 
+-- | Aet of projectiles data  types
 data ProjectileType = Sun | Pea 
   deriving (Eq, Show, Read)
 
 -- | Data type for projectile of the other plant
 data Projectile = Projectile
-  { prType   :: ProjectileType
+  { prType   :: ProjectileType  -- ^ projectile type
   , prCoords :: Coords          -- ^ coordinates of projectile
   }
   deriving (Show, Read)
@@ -107,22 +111,24 @@ pPicture PeasShooter = plant
 pPicture Sunflower   = sunflower
 pPicture Wallnut = wallnut
 
+-- | Accessor for the cooldown of the projectile
 pFrequency :: PlantType -> Float
 pFrequency PeasShooter = 1.5
 pFrequency Sunflower   = 24
 pFrequency Wallnut = 1
 
+-- | Accessor for the starting cooldown of the projectile
 pStarterTimer :: PlantType -> Float
 pStarterTimer PeasShooter = 0
 pStarterTimer Sunflower   = 7
 pStarterTimer Wallnut = 1
 
+-- | Accessor to render projectile type
 prPicture :: ProjectileType -> Picture
 prPicture Sun = sun
 prPicture Pea = projectile
--- prPicture NoProjectile = blank
 
--- | Data type for whole Universe
+-- | Data type for the whole Universe
 data Universe = Universe
   { uEnemies  :: [Zombie]              -- ^ predefined wave
   , uDefense  :: [Plant]               -- ^ list of plants that player put
@@ -143,6 +149,7 @@ data Stage = Game | NewCard | NextLevel | Menu | EditName
 data Level = One | Two | Three | Four | Five
   deriving (Eq, Show, Read)
 
+-- | Function to determine what pictures to show depending on the level 
 newScreen :: Level -> Stage -> Picture
 newScreen One NewCard     = sunflowerCard
 newScreen One NextLevel   = sunflowerAlmanac
@@ -159,9 +166,9 @@ newScreen _ EditName      = menu <> user
 newScreen _ Game          = blank
 
 data State = State
-  { sName     :: UserName 
-  , sEdit     :: Bool
-  , sUniverse :: Universe
-  , sLevels   :: [Universe]
+  { sName     :: UserName   -- ^ name given by the current user
+  , sEdit     :: Bool       -- ^ denotes whether a user can use the keyboard or not
+  , sUniverse :: Universe   -- ^ current level
+  , sLevels   :: [Universe] -- ^ set of all levels
   }
   deriving (Show, Read)

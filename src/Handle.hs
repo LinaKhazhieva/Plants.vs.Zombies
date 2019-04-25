@@ -347,7 +347,7 @@ saveName s = do name <- readFile "save/userName.txt"
 --                       state
 startGame :: Coords -> Universe -> Universe
 startGame mc u
-  | isStart   = u { uStage = Menu }
+  | isStart   = u { uStage = Game }
   | isEdit    = u { uStage = EditName }
   | otherwise = u
   where
